@@ -11,6 +11,7 @@ def connect():
     return psycopg2.connect(
         host=DATABASE_HOST,
         user=DATABASE_USER,
+        password=DATABASE_PASSWORD,
         dbname=DATABASE_NAME
     )
 
