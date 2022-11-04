@@ -1,17 +1,31 @@
 from dataclasses import dataclass
+from db import fetch
+from exc import CurrencyNotFoundError
 
 
 @dataclass(init=True, eq=True, order=True, unsafe_hash=False, frozen=False)
 class Currency:
+    """ Represents a single currency """
     name: str
     symbol: str
     value: float
 
-    # TODO: Implement – gets all currencies from the database
-    #  Should raise an exception if the operation fails
     @classmethod
     def get_currencies(cls) -> list["Currency"]:
-        return []
+        """
+        Gets all possible currencies from the database
+        :return: A list of all currencies
+        """
+        c = []
+
+        result = fetch("SELECT symbol, name, exchange_rate FROM currencies", ())
+        if result is None:
+            raise CurrencyNotFoundError("No currencies found")
+        for raw_currency in result:
+            currency = Currency(raw_currency[1], raw_currency[0], raw_currency[2])
+            c.append(currency)
+
+        return c
 
     # TODO: Implement converting, needs to round a value (can't have 2.9203 of a beer)
     def convert_to(self, other_currency: "Currency") -> "Price":

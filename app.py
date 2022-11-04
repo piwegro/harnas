@@ -1,8 +1,10 @@
 from flask import Flask, request
 
 from users import User
+from currencies import Currency
 from firebase import FirebaseUser, initialize_firebase
 from health import check_health
+
 
 app = Flask(__name__)
 
@@ -57,6 +59,13 @@ def handle_get_conversation_by_id(conversation_id: str):
 @app.route("/message", methods=["POST"])
 def handle_send_message(req):
     return "WIP"
+
+
+# Get all currencies
+@app.route("/currencies")
+def handle_get_all_currencies():
+    c = Currency.get_currencies()
+    return c
 
 
 @app.route("/health")
