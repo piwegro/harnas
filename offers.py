@@ -3,19 +3,7 @@ from dataclasses import dataclass
 from datetime import datetime
 
 from users import User
-from currencies import Currency
-
-
-@dataclass(init=True, eq=True, order=True, unsafe_hash=False, frozen=False)
-class Price:
-    price: int
-    currency: Currency
-
-    def __str__(self):
-        pass
-
-    def __repr__(self):
-        pass
+from currencies import Currency, Price
 
 
 @dataclass(init=True, eq=True, order=True, unsafe_hash=False, frozen=False)
