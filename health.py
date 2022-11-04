@@ -1,10 +1,8 @@
+# TODO: Add an actual health checking
 def check_health() -> [bool, str]:
     """
-    Checks health of the whole backend system
-
-    Returns:
-        [bool, str]: [True, None] if everything is ok, [False, str] if there is an error.
-        The string is a human-readable error message.
-
+    Checks the health of the application.
+    :return: A tuple containing a boolean indicating the health status (true if healthy, false otherwise) and
+    a string containing an optional error message.
     """
     return True, None
