@@ -3,12 +3,13 @@ from dataclasses import dataclass
 from datetime import datetime
 
 from users import User
+from currencies import Currency
 
 
 @dataclass(init=True, eq=True, order=True, unsafe_hash=False, frozen=False)
 class Price:
     price: int
-    currency: str
+    currency: Currency
 
     def __str__(self):
         pass
@@ -27,6 +28,23 @@ class Offer:
     images: list[str]
     created_at: datetime
 
+    # TODO: Should add an offer to the database and then return the offer
+    @classmethod
+    def new_offer(cls, title: str, description: str, price: Price, seller: User, images: list[str]) -> "Offer":
+        return cls("", "", "", Price(0, Currency("", "", 1.0)), User("", "", "", []), [], datetime.now())
+
+    @classmethod
+    def get_all_offers(cls) -> list["Offer"]:
+        return []
+
+    @classmethod
+    def get_offer_by_id(cls, offer_id: str) -> "Offer":
+        return cls("", "", "", Price(0, Currency("", "", 1.0)), User("", "", "", []), [], datetime.now())
+
+    @classmethod
+    def get_offers_by_user_id(cls, user_id: str) -> list["Offer"]:
+        return []
+
     # TODO: Implement, see https://stackoverflow.com/questions/1436703/what-is-the-difference-between-str-and-repr
     def __str__(self):
         pass
@@ -34,19 +52,3 @@ class Offer:
     # TODO: Implement, see https://stackoverflow.com/questions/1436703/what-is-the-difference-between-str-and-repr
     def __repr__(self):
         pass
-
-
-def get_all_offers() -> tuple[Offer]:
-    pass
-
-
-def get_offer_by_id(offer_id: str) -> Offer:
-    pass
-
-
-def get_offers_by_user_id(user_id: str) -> tuple[Offer]:
-    pass
-
-
-def add_offer(offer: Offer):
-    pass

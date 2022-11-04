@@ -18,6 +18,23 @@ class User:
 
     accepted_currencies: list[Currency]
 
+    # TODO: Should show user's accepted currencies
+    @classmethod
+    def get_user_by_id(cls, user_id: str) -> "User":
+        """
+        Get a user by its id
+        :param user_id: The id of the user
+        :return: The user
+        :raises UserNotFoundError: If the user does not exist
+        """
+        result = execute("SELECT id, email, name FROM users WHERE id = %s", (user_id,))
+        raw_user = result[0]
+
+        if raw_user is None:
+            raise UserNotFoundError(user_id)
+
+        return cls(raw_user[0], raw_user[1], raw_user[2], [])
+
     # TODO: Implement, should check whether the user exists in the database (see insert_user),
     #  if not, add it to the database, with the default accepted currencies (HAR)
     @classmethod
@@ -44,27 +61,4 @@ class User:
     # TODO: Implement, see https://stackoverflow.com/questions/1436703/what-is-the-difference-between-str-and-repr
     def __repr__(self):
         pass
-
-
-# TODO: Should show user's accepted currencies
-def get_user_by_id(user_id: str) -> User:
-    """
-    Get a user by its id
-    :param user_id: The id of the user
-    :return: The user
-    :raises UserNotFoundError: If the user does not exist
-    """
-    result = execute("SELECT id, email, name FROM users WHERE id = %s", (user_id,))
-    raw_user = result[0]
-
-    if raw_user is None:
-        raise UserNotFoundError(user_id)
-
-    return User(raw_user[0], raw_user[1], raw_user[2], [])
-
-
-# TODO: Implement, should insert a user (that is already in the Firebase) into the database (Postgres)
-#  Should raise an exception if the user already exists or if the addition fails
-def insert_user(user: User):
-    pass
 

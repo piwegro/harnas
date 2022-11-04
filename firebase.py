@@ -18,6 +18,15 @@ class FirebaseUser:
     def from_user_record(cls, user_record: auth.UserRecord):
         return cls(user_record.email, user_record.display_name, user_record.uid)
 
+    @classmethod
+    def get_user_by_uid(cls, uid: str) -> "FirebaseUser":
+        global firebase_app
+        if firebase_app is None:
+            raise FirebaseNotInitializedError()
+
+        user_record = auth.get_user(uid)
+        return cls.from_user_record(user_record)
+
     # TODO: Implement, see https://stackoverflow.com/questions/1436703/what-is-the-difference-between-str-and-repr
     def __str__(self):
         pass
@@ -38,15 +47,6 @@ def initialize_firebase() -> None:
     cred = credentials.Certificate('serviceAccountKey.json')
 
     firebase_app = firebase_admin.initialize_app(cred)
-
-
-def get_user_by_uid(uid: str) -> FirebaseUser:
-    global firebase_app
-    if firebase_app is None:
-        raise FirebaseNotInitializedError()
-
-    user_record = auth.get_user(uid)
-    return FirebaseUser.from_user_record(user_record)
 
 
 def verify_token(token: str):
