@@ -1,4 +1,3 @@
-from db import execute
 from dataclasses import dataclass
 from datetime import datetime
 

@@ -1,9 +1,13 @@
 import firebase_admin
 
+from os import environ
+
 from firebase_admin import credentials, auth
 from exc import FirebaseNotInitializedError
 
 from dataclasses import dataclass
+
+SERVICE_ACCOUNT_PATH = environ["SERVICE_ACCOUNT_PATH"]
 
 firebase_app = None
 
@@ -16,7 +20,7 @@ class FirebaseUser:
 
     @classmethod
     def from_user_record(cls, user_record: auth.UserRecord):
-        return cls(user_record.email, user_record.display_name, user_record.uid)
+        return cls(user_record.uid, user_record.email, user_record.display_name)
 
     @classmethod
     def get_user_by_uid(cls, uid: str) -> "FirebaseUser":
@@ -44,7 +48,7 @@ def initialize_firebase() -> None:
     if firebase_app is not None:
         return
 
-    cred = credentials.Certificate('serviceAccountKey.json')
+    cred = credentials.Certificate(SERVICE_ACCOUNT_PATH)
 
     firebase_app = firebase_admin.initialize_app(cred)
 

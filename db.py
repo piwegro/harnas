@@ -23,7 +23,7 @@ def connect() -> None:
     )
 
 
-def execute(query: str, params: tuple):
+def fetch(query: str, params: tuple):
     global connection
     if connection is None:
         connect()
@@ -33,3 +33,13 @@ def execute(query: str, params: tuple):
         connection.commit()
 
         return cursor.fetchall()
+
+
+def execute(query: str, params: tuple):
+    global connection
+    if connection is None:
+        connect()
+
+    with connection.cursor() as cursor:
+        cursor.execute(query, params)
+        connection.commit()
