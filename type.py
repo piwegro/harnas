@@ -23,9 +23,9 @@ class User:
         self.name = name
         self.uid = uid
 
-    @staticmethod
-    def from_user_record(user_record: auth.UserRecord):
-        return User(user_record.email, user_record.display_name, user_record.uid)
+    @classmethod
+    def from_user_record(cls, user_record: auth.UserRecord):
+        return cls(user_record.email, user_record.display_name, user_record.uid)
 
 
 @dataclass
@@ -43,3 +43,18 @@ class Offer:
     seller: User
     images: list[str]
     created_at: datetime
+
+
+@dataclass
+class Message:
+    id: str
+    sender: User
+    receiver: User
+    content: str
+    sent_at: datetime
+
+
+@dataclass
+class Conversation:
+    id: str
+    messages: list[Message]

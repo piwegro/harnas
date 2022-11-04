@@ -1,16 +1,16 @@
 from db import execute
-from types import Offer
+from type import Offer
 
 
-def get_all_offers():
+def get_all_offers() -> tuple[Offer]:
     pass
 
 
-def get_offer_by_id(id: str):
+def get_offer_by_id(offer_id: str) -> Offer:
     pass
 
 
-def get_offers_by_user_id(user_id: str):
+def get_offers_by_user_id(user_id: str) -> tuple[Offer]:
     pass
 
 

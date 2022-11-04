@@ -9,7 +9,7 @@ DATABASE_NAME = environ["POSTGRES_DB_MAIN"]
 connection = None
 
 
-def connect():
+def connect() -> None:
     global connection
     if connection is not None:
         return

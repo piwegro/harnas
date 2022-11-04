@@ -2,7 +2,7 @@ import firebase_admin
 
 from firebase_admin import credentials, auth
 from exc import FirebaseNotInitializedError
-from types import User
+from type import User
 
 firebase_app = None
 
@@ -41,6 +41,5 @@ def verify_token(token: str):
         return None
     except auth.InvalidIdTokenError:
         return None
-    except Exception as e:
-        raise e
-
+    except Exception:
+        raise
