@@ -18,7 +18,8 @@ def connect() -> None:
         host=DATABASE_HOST,
         user=DATABASE_USER,
         password=DATABASE_PASSWORD,
-        dbname=DATABASE_NAME
+        dbname=DATABASE_NAME,
+        options="-c search_path=piwegro"
     )
 
 

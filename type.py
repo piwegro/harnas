@@ -18,10 +18,12 @@ class User:
 
     accepted_currencies: list[Currency]
 
-    def __init__(self, email: str, name: str, uid: str):
+    def __init__(self, uid: str, email: str, name: str):
+        self.uid = uid
         self.email = email
         self.name = name
-        self.uid = uid
+
+        self.accepted_currencies = []
 
     @classmethod
     def from_user_record(cls, user_record: auth.UserRecord):

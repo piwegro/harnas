@@ -1,5 +1,6 @@
 from flask import Flask, request
 
+from users import get_user_by_id
 from health import check_health
 
 app = Flask(__name__)
@@ -18,9 +19,10 @@ def get_offer_by_id(offer_id: str):
 
 
 # User info
-@app.route("/user/<id>")
-def get_user_by_id(user_id: str):
-    return "WIP"
+@app.route("/user/<user_id>")
+def handle_user_by_id(user_id: str):
+    user = get_user_by_id(user_id)
+    return vars(user)
 
 
 # All offers by user (not paginated [?])
