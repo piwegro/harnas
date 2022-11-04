@@ -1,9 +1,5 @@
 class FirebaseError (Exception):
-    """Base class for all exceptions raised by the firebase module.
-
-    Attributes:
-        message: A string describing the error.
-    """
+    """Base class for all exceptions raised by the firebase module."""
 
     def __init__(self, message):
         self.message = message
@@ -17,3 +13,15 @@ class FirebaseNotInitializedError (FirebaseError):
 
     def __init__(self):
         super().__init__("Firebase is not initialized.")
+
+
+class UserNotFoundError (Exception):
+    """Raised when a user is not found in the database."""
+
+    def __init__(self, uid):
+        self.uid = uid
+
+    def __str__(self):
+        return f"User with uid {self.uid} not found."
+
+
