@@ -4,7 +4,7 @@ from dataclasses import dataclass
 from firebase import FirebaseUser
 
 # Exceptions
-from exc import UserNotFoundError
+from exc import UserNotFoundError, PostgresError
 
 # Functions import
 from db import execute
@@ -18,7 +18,6 @@ class User:
 
     accepted_currencies: list[Currency]
 
-    # TODO: Should show user's accepted currencies
     @classmethod
     def get_user_by_id(cls, user_id: str) -> "User":
         """
@@ -26,14 +25,33 @@ class User:
         :param user_id: The id of the user
         :return: The user
         :raises UserNotFoundError: If the user does not exist
+        :raises PostgresError: If the database error occurs
         """
         result = execute("SELECT id, email, name FROM users WHERE id = %s", (user_id,))
-        raw_user = result[0]
+        if result is None or len(result) == 0:
+            raise UserNotFoundError(user_id)
 
+        if len(result) > 1:
+            raise PostgresError("More than one user with the same id")
+
+        raw_user = result[0]
         if raw_user is None:
             raise UserNotFoundError(user_id)
 
-        return cls(raw_user[0], raw_user[1], raw_user[2], [])
+        user = cls(raw_user[0], raw_user[1], raw_user[2], [])
+
+        result = execute("SELECT name, symbol, exchange_rate FROM currencies WHERE symbol IN "
+                         "(SELECT currency_symbol FROM accepted_currencies WHERE user_id = %s)",
+                         (user_id,))
+
+        if result is None or len(result) == 0:
+            raise PostgresError("No accepted currencies for user with id " + user_id)
+
+        for raw_currency in result:
+            currency = Currency(raw_currency[0], raw_currency[1], raw_currency[2])
+            user.accepted_currencies.append(currency)
+
+        return user
 
     # TODO: Implement, should check whether the user exists in the database (see insert_user),
     #  if not, add it to the database, with the default accepted currencies (HAR)

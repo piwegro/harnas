@@ -25,3 +25,13 @@ class UserNotFoundError (Exception):
         return f"User with uid {self.uid} not found."
 
 
+class PostgresError (Exception):
+    """Base class for all exceptions raised by the postgres module."""
+
+    def __init__(self, message):
+        self.message = message
+
+    def __str__(self):
+        return self.message
+
+
