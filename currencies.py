@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from offers import Price
 
 
 @dataclass(init=True, eq=True, order=True, unsafe_hash=False, frozen=False)
@@ -14,8 +15,8 @@ class Currency:
         return []
 
     # TODO: Implement converting, needs to round a value (can't have 2.9203 of a beer)
-    def convert_to(self, other_currency: "Currency") -> int:
-        return 0
+    def convert_to(self, other_currency: "Currency") -> Price:
+        return Price(0, other_currency)
 
     # TODO: Implement, see https://stackoverflow.com/questions/1436703/what-is-the-difference-between-str-and-repr
     def __str__(self) -> str:
