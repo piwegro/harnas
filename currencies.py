@@ -33,11 +33,11 @@ class Currency:
 
     # TODO: Implement, see https://stackoverflow.com/questions/1436703/what-is-the-difference-between-str-and-repr
     def __str__(self) -> str:
-        return ""
+        return f'Currency(name="{self.name}", symbol="{self.symbol}", value="{self.value}")'
 
     # TODO: Implement, see https://stackoverflow.com/questions/1436703/what-is-the-difference-between-str-and-repr
     def __repr__(self):
-        return ""
+        return f'Currency("{self.name}", "{self.symbol}", "{self.value}")'
 
 
 @dataclass(init=True, eq=True, order=True, unsafe_hash=False, frozen=False)
@@ -46,7 +46,7 @@ class Price:
     currency: Currency
 
     def __str__(self):
-        pass
+        return f'Price(price="{self.price}", currency="{self.currency.name  }")'
 
     def __repr__(self):
-        pass
+        return f'Price("{self.price}", "{self.currency.name}")'

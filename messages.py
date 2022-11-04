@@ -17,11 +17,12 @@ class Message:
 
     # TODO: Implement, see https://stackoverflow.com/questions/1436703/what-is-the-difference-between-str-and-repr
     def __str__(self):
-        pass
+        return f'Message(message_id="{self.message_id}", sender\'s ID={self.sender.uid}, receiver\'s ID="{self.receiver.uid}", content="{self.content}", sent_at="{self.sent_at}")'
 
     # TODO: Implement, see https://stackoverflow.com/questions/1436703/what-is-the-difference-between-str-and-repr
     def __repr__(self):
-        pass
+        return f'Message("{self.message_id}", "{self.sender.uid}", "{self.receiver.uid}", "{self.content}", "{self.sent_at}")'
+
 
 
 @dataclass(init=True, eq=True, order=True, unsafe_hash=False, frozen=False)
@@ -43,8 +44,9 @@ class Conversation:
 
     # TODO: Implement, see https://stackoverflow.com/questions/1436703/what-is-the-difference-between-str-and-repr
     def __str__(self) -> str:
-        return ""
+        return f'Conversation(id="{self.conversation_id}", messages="{self.messages}")'
 
     # TODO: Implement, see https://stackoverflow.com/questions/1436703/what-is-the-difference-between-str-and-repr
     def __repr__(self) -> str:
-        return ""
+        return f'Conversation("{self.conversation_id}", "{self.messages}")'
+

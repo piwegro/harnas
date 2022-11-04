@@ -34,8 +34,8 @@ class Offer:
 
     # TODO: Implement, see https://stackoverflow.com/questions/1436703/what-is-the-difference-between-str-and-repr
     def __str__(self):
-        pass
+        return f'Offer(id="{self.id}", title="{self.title}", description="{self.description}", price="{self.price.price}", currency="{self.price.currency}", seller\' id="{self.seller.uid}", images="{self.images}", created_at="{self.created_at.min}")'
 
     # TODO: Implement, see https://stackoverflow.com/questions/1436703/what-is-the-difference-between-str-and-repr
     def __repr__(self):
-        pass
+        return f'Offer("{self.id}", "{self.title}", "{self.description}", "{self.price.price}", "{self.price.currency}", "{self.seller.uid}", "{self.images}", "{self.created_at.min}")'

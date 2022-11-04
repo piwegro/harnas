@@ -33,11 +33,11 @@ class FirebaseUser:
 
     # TODO: Implement, see https://stackoverflow.com/questions/1436703/what-is-the-difference-between-str-and-repr
     def __str__(self):
-        pass
+        return f"FirebaseUser(uid={self.uid}, email={self.email}, name={self.name})"
 
     # TODO: Implement, see https://stackoverflow.com/questions/1436703/what-is-the-difference-between-str-and-repr
     def __repr__(self):
-        pass
+        return f"FirebaseUser({self.uid}, {self.email}, {self.name})"
 
 
 def initialize_firebase() -> None:
