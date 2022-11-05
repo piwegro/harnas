@@ -33,11 +33,9 @@ class Currency:
         price = self.value * other_currency.value
         return Price(0, other_currency)
 
-    # TODO: Implement, see https://stackoverflow.com/questions/1436703/what-is-the-difference-between-str-and-repr
-    def __str__(self) -> str:
+    def __str__(self):
         return f'Currency(name="{self.name}", symbol="{self.symbol}", value="{self.value}")'
 
-    # TODO: Implement, see https://stackoverflow.com/questions/1436703/what-is-the-difference-between-str-and-repr
     def __repr__(self):
         return f'Currency("{self.name}", "{self.symbol}", "{self.value}")'
 
