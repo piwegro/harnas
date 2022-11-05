@@ -30,6 +30,7 @@ def handle_user_by_id(user_id: str):
     return vars(user)
 
 
+# Called after creating a new user to put them in the database
 @app.route("/user/<user_id>", methods=["PUT"])
 def handle_add_user_to_db(user_id: str):
     fuser = FirebaseUser.get_user_by_uid(user_id)
@@ -43,19 +44,13 @@ def handle_get_offers_by_user_id(user_id: str):
     return "WIP"
 
 
-# Get all conversations for user
+# Get all messages for a user (basically all messages grouped by a recipient)
 @app.route("/user/<id>/conversations")
 def handle_get_user_conversations(user_id: str):
     return "WIP"
 
 
-# Get a single conversation
-@app.route("/conversation/<id>")
-def handle_get_conversation_by_id(conversation_id: str):
-    return "WIP"
-
-
-# Send a message to a conversation
+# Send a message to another user
 @app.route("/message", methods=["POST"])
 def handle_send_message(req):
     return "WIP"

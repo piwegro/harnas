@@ -23,6 +23,7 @@ class User:
         """
         Get a user by its id
         :param user_id: The id of the user
+
         :return: The user
         :raises UserNotFoundError: If the user does not exist
         :raises PostgresError: If the database error occurs

@@ -14,6 +14,7 @@ class Currency:
     def get_currencies(cls) -> list["Currency"]:
         """
         Gets all possible currencies from the database
+
         :return: A list of all currencies
         """
         c = []
@@ -29,6 +30,7 @@ class Currency:
 
     # TODO: Implement converting, needs to round a value (can't have 2.9203 of a beer)
     def convert_to(self, other_currency: "Currency") -> "Price":
+        price = self.value * other_currency.value
         return Price(0, other_currency)
 
     # TODO: Implement, see https://stackoverflow.com/questions/1436703/what-is-the-difference-between-str-and-repr
