@@ -28,10 +28,15 @@ class Currency:
 
         return c
 
-    # TODO: Implement converting, needs to round a value (can't have 2.9203 of a beer)
+    # TODO: check if this is a right place for rounding
     def convert_to(self, other_currency: "Currency") -> "Price":
-        price = self.value * other_currency.value
-        return Price(0, other_currency)
+        value = self.value / other_currency.value
+        if(value < 1):
+            value = 1
+        else:
+            value = round(value, 0)
+
+        return Price(value, other_currency)
 
     def __str__(self):
         return f'Currency(name="{self.name}", symbol="{self.symbol}", value="{self.value}")'
