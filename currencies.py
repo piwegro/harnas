@@ -44,11 +44,11 @@ class Currency:
 
 @dataclass(init=True, eq=True, order=True, unsafe_hash=False, frozen=False)
 class Price:
-    price: int
+    amount: int
     currency: Currency
 
     def __str__(self):
-        return f'Price(price="{self.price}", currency="{self.currency.name  }")'
+        return f'Price(price="{self.amount}", currency="{self.currency.name  }")'
 
     def __repr__(self):
-        return f'Price("{self.price}", "{self.currency.name}")'
+        return f'Price("{self.amount}", "{self.currency.name}")'
