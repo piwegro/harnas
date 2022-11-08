@@ -88,6 +88,7 @@ class User:
         """
         Create a user from a FirebaseUser by adding the accepted currencies and the user themselves
         to the postgres database
+
         :param firebase_user: The FirebaseUser
         :return: The new user
         """
