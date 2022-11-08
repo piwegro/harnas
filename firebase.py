@@ -31,11 +31,9 @@ class FirebaseUser:
         user_record = auth.get_user(uid)
         return cls.from_user_record(user_record)
 
-    # TODO: Implement, see https://stackoverflow.com/questions/1436703/what-is-the-difference-between-str-and-repr
     def __str__(self):
         return f"FirebaseUser(uid={self.uid}, email={self.email}, name={self.name})"
 
-    # TODO: Implement, see https://stackoverflow.com/questions/1436703/what-is-the-difference-between-str-and-repr
     def __repr__(self):
         return f"FirebaseUser({self.uid}, {self.email}, {self.name})"
 
