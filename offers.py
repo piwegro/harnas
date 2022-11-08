@@ -1,4 +1,3 @@
-from db import execute
 from dataclasses import dataclass
 from datetime import datetime
 
@@ -33,10 +32,11 @@ class Offer:
     def get_offers_by_user_id(cls, user_id: str) -> list["Offer"]:
         return []
 
-    # TODO: Implement, see https://stackoverflow.com/questions/1436703/what-is-the-difference-between-str-and-repr
     def __str__(self):
-        pass
+        return f'Offer(id="{self.id}", title="{self.title}", description="{self.description}", ' \
+               f'price="{self.price.amount}", currency="{self.price.currency}", seller\' id="{self.seller.uid}", ' \
+               f'images="{self.images}", created_at="{self.created_at.min}")'
 
-    # TODO: Implement, see https://stackoverflow.com/questions/1436703/what-is-the-difference-between-str-and-repr
     def __repr__(self):
-        pass
+        return f'Offer("{self.id}", "{self.title}", "{self.description}", "{self.price.amount}", ' \
+               f'"{self.price.currency}", "{self.seller.uid}", "{self.images}", "{self.created_at.min}")'

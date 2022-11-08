@@ -25,6 +25,16 @@ class UserNotFoundError (Exception):
         return f"User with uid {self.uid} not found."
 
 
+class CurrencyNotFoundError (Exception):
+    """Raised when a currency is not found in the database."""
+
+    def __init__(self, symbol):
+        self.symbol = symbol
+
+    def __str__(self):
+        return f"Currency with symbol {self.symbol} not found."
+
+
 class PostgresError (Exception):
     """Base class for all exceptions raised by the postgres module."""
 
