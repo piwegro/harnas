@@ -34,7 +34,10 @@ class Offer:
 
 
     def __str__(self):
-        return f'Offer(id="{self.id}", title="{self.title}", description="{self.description}", price="{self.price.price}", currency="{self.price.currency}", seller\' id="{self.seller.uid}", images="{self.images}", created_at="{self.created_at.min}")'
+        return f'Offer(id="{self.id}", title="{self.title}", description="{self.description}", ' \
+               f'price="{self.price.amount}", currency="{self.price.currency}", seller\' id="{self.seller.uid}", ' \
+               f'images="{self.images}", created_at="{self.created_at.min}")'
 
     def __repr__(self):
-        return f'Offer("{self.id}", "{self.title}", "{self.description}", "{self.price.price}", "{self.price.currency}", "{self.seller.uid}", "{self.images}", "{self.created_at.min}")'
+        return f'Offer("{self.id}", "{self.title}", "{self.description}", "{self.price.amount}", ' \
+               f'"{self.price.currency}", "{self.seller.uid}", "{self.images}", "{self.created_at.min}")'
