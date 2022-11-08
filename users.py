@@ -88,6 +88,7 @@ class User:
         """
         Create a user from a FirebaseUser by adding the accepted currencies and the user themselves
         to the postgres database
+
         :param firebase_user: The FirebaseUser
         :return: The new user
         """
@@ -99,10 +100,9 @@ class User:
         user.add_accepted_currency(Currency("Harnaś", "HAR", 1.0))
         return user
 
-    # TODO: Implement, see https://stackoverflow.com/questions/1436703/what-is-the-difference-between-str-and-repr
     def __str__(self):
-        pass
+        return f'User(user_id="{self.uid}", email="{self.email}", name="{self.name}", accepted_currencies={self.accepted_currencies})'
 
-    # TODO: Implement, see https://stackoverflow.com/questions/1436703/what-is-the-difference-between-str-and-repr
+
     def __repr__(self):
-        pass
+        return f'User("{self.uid}", "{self.email}", "{self.name}", {self.accepted_currencies})'
