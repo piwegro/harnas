@@ -23,6 +23,5 @@ class Message:
     def __str__(self):
         return f"Message {self.message_id} from {self.sender.uid} to {self.receiver.uid} at {self.sent_at}"
 
-
     def __repr__(self):
         return f'Message("{self.message_id}", "{self.sender.uid}", "{self.receiver.uid}", "{self.content}", "{self.sent_at}")'

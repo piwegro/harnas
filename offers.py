@@ -32,7 +32,6 @@ class Offer:
     def get_offers_by_user_id(cls, user_id: str) -> list["Offer"]:
         return []
 
-
     def __str__(self):
         return f'Offer(id="{self.id}", title="{self.title}", description="{self.description}", ' \
                f'price="{self.price.amount}", currency="{self.price.currency}", seller\' id="{self.seller.uid}", ' \
