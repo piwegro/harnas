@@ -4,7 +4,7 @@ from users import User
 from currencies import Currency
 from firebase import FirebaseUser, initialize_firebase
 from health import check_health
-
+from messages import Message
 
 app = Flask(__name__)
 initialize_firebase()
