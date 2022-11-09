@@ -49,13 +49,6 @@ class Offer:
                     User.get_user_by_id(raw_offer[1]), raw_offer[6], raw_offer[7])
         return offer
 
-        id: str
-        title: str
-        description: str
-        price: Price
-        seller: User
-        images: list[str]
-        created_at: datetime
     @classmethod
     def get_offers_by_user_id(cls, user_id: str) -> list["Offer"]:
         return []
