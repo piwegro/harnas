@@ -439,3 +439,6 @@ $RECYCLE.BIN/
 # End of https://www.toptal.com/developers/gitignore/api/macos,windows,pycharm,python,flask,git
 
 serviceAccount.json
+
+tests.py
+
