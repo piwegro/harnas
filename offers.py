@@ -28,8 +28,23 @@ class Offer:
         return cls("", "", "", Price(0, Currency("", "", 1.0)), User("", "", "", []), [], datetime.now())
 
     @classmethod
+    def new_offer_from_row(cls, raw_offer) -> "Offer":
+        return cls(raw_offer[0], raw_offer[2], raw_offer[3],
+                   Price(raw_offer[4], Currency.get_currency_by_symbol(raw_offer[5])),
+                   User.get_user_by_id(raw_offer[1]), raw_offer[6], raw_offer[7])
+
+    @classmethod
     def get_all_offers(cls) -> list["Offer"]:
-        return []
+        result = fetch("SELECT * FROM offers", ())
+        if result is None or len(result) == 0:
+            raise CurrencyNotFoundError("No offers found")
+
+        listOfOffers = []
+
+        for offer in result:
+            listOfOffers.append(cls.new_offer_from_row(offer))
+
+        return listOfOffers
 
     @classmethod
     def get_offer_by_id(cls, offer_id: str) -> "Offer":
@@ -45,8 +60,7 @@ class Offer:
             raise CurrencyNotFoundError("No offers found")
 
 
-        offer = cls(raw_offer[0], raw_offer[2], raw_offer[3], Price(raw_offer[4], Currency.get_currency_by_symbol(raw_offer[5])),
-                    User.get_user_by_id(raw_offer[1]), raw_offer[6], raw_offer[7])
+        offer = cls.new_offer_from_row(raw_offer)
         return offer
 
     @classmethod
@@ -62,8 +76,7 @@ class Offer:
 
         listOfOffers = []
         for offer in result:
-            listOfOffers.append(cls(offer[0], offer[2], offer[3], Price(offer[4], Currency.get_currency_by_symbol(offer[5])),
-                    User.get_user_by_id(offer[1]), offer[6], offer[7]))
+            listOfOffers.append(cls.new_offer_from_row(offer))
 
         return listOfOffers
 
