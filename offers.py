@@ -51,7 +51,22 @@ class Offer:
 
     @classmethod
     def get_offers_by_user_id(cls, user_id: str) -> list["Offer"]:
-        return []
+        result = fetch("SELECT * from offers WHERE seller_id = %s", (user_id,))
+
+        if result is None or len(result) == 0:
+            raise CurrencyNotFoundError("No offers found")
+
+        raw_offer = result[0]
+        if raw_offer is None:
+            raise CurrencyNotFoundError("No offers found")
+
+        listOfOffers = []
+        for offer in result:
+            listOfOffers.append(cls(offer[0], offer[2], offer[3], Price(offer[4], Currency.get_currency_by_symbol(offer[5])),
+                    User.get_user_by_id(offer[1]), offer[6], offer[7]))
+
+        return listOfOffers
+
 
 
     def __str__(self):
