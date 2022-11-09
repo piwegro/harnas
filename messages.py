@@ -30,6 +30,8 @@ class Message:
         :param sent_at: The time the message was sent.
         :return: The created message.
         """
+
+        # TODO: Handle non-existent users
         return cls(None, User.get_user_by_id(sender_id), User.get_user_by_id(receiver_id), content, sent_at)
 
     @classmethod
@@ -46,7 +48,6 @@ class Message:
         """
         return cls(None, sender, receiver, content, sent_at)
 
-    # TODO: Handle errors
     def send(self) -> None:
         """
         Sends the message to the database.
@@ -78,6 +79,8 @@ class Message:
         :param user_id: The id of the user.
         :return: A list of messages.
         """
+        # TODO: Handle non-existent users
+
         m = []
 
         result = fetch("SELECT * FROM messages WHERE sender_id = %s OR receiver_id = %s", (user_id, user_id))
