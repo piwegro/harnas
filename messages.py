@@ -19,7 +19,21 @@ class Message:
     is_sent: bool = False
 
     @classmethod
-    def new_message(cls, sender: User, receiver: User, content: str, sent_at: datetime = datetime.now()):
+    def new_message_with_ids(cls, sender_id: str, receiver_id: str, content: str,
+                             sent_at: datetime = datetime.now()) -> "Message":
+        """
+        Creates a new message with the user ids instead of the user objects.
+
+        :param sender_id: The id of the sender.
+        :param receiver_id: The id of the receiver.
+        :param content: The content of the message.
+        :param sent_at: The time the message was sent.
+        :return: The created message.
+        """
+        return cls(None, User.get_user_by_id(sender_id), User.get_user_by_id(receiver_id), content, sent_at)
+
+    @classmethod
+    def new_message(cls, sender: User, receiver: User, content: str, sent_at: datetime = datetime.now()) -> "Message":
         """
         Creates a new message object without an id. Note that the message is not sent until the send_message method is
         called.
@@ -33,7 +47,7 @@ class Message:
         return cls(None, sender, receiver, content, sent_at)
 
     # TODO: Handle errors
-    def send_message(self) -> None:
+    def send(self) -> None:
         """
         Sends the message to the database.
 
