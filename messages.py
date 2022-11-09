@@ -10,6 +10,7 @@ from db import execute, fetch
 @dataclass(init=True, eq=True, order=True, unsafe_hash=False, frozen=False)
 class Message:
     message_id: Optional[str]
+
     sender: User
     receiver: User
     content: str
@@ -19,10 +20,29 @@ class Message:
 
     @classmethod
     def new_message(cls, sender: User, receiver: User, content: str, sent_at: datetime = datetime.now()):
+        """
+        Creates a new message object without an id. Note that the message is not sent until the send_message method is
+        called.
+
+        :param sender: The user that sends the message.
+        :param receiver: The user that receives the message.
+        :param content: The content of the message.
+        :param sent_at: The time when the message was sent. Defaults to the current time.
+        :return: A new message object.
+        """
         return cls(None, sender, receiver, content, sent_at)
 
     # TODO: Handle errors
     def send_message(self) -> None:
+        """
+        Sends the message to the database.
+
+        :raise ValueError: If the message is already sent.
+        """
+        # TODO: Different exception type
+        if self.is_sent:
+            raise ValueError("Message already sent")
+
         execute("INSERT INTO messages (sender_id, receiver_id, content, sent_at) VALUES (%s, %s, %s, %s)",
                 (self.sender.uid, self.receiver.uid, self.content, self.sent_at))
 
@@ -38,6 +58,12 @@ class Message:
 
     @classmethod
     def get_messages_by_user_id(cls, user_id: str) -> list["Message"]:
+        """
+        Get all messages sent to or from a user.
+
+        :param user_id: The id of the user.
+        :return: A list of messages.
+        """
         m = []
 
         result = fetch("SELECT * FROM messages WHERE sender_id = %s OR receiver_id = %s", (user_id, user_id))
@@ -48,8 +74,8 @@ class Message:
 
         return m
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"Message {self.message_id} from {self.sender.uid} to {self.receiver.uid} at {self.sent_at}"
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f'Message("{self.message_id}", "{self.sender.uid}", "{self.receiver.uid}", "{self.content}", "{self.sent_at}")'
