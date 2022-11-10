@@ -48,14 +48,11 @@ class Currency:
 
         return cls(raw_currency[1], raw_currency[0], raw_currency[2])
 
-
-
     def __str__(self):
         return f'Currency(name="{self.name}", symbol="{self.symbol}", value="{self.value}")'
 
     def __repr__(self):
         return f'Currency("{self.name}", "{self.symbol}", "{self.value}")'
-
 
 @dataclass(init=True, eq=True, order=True, unsafe_hash=False, frozen=False)
 class Price:
@@ -63,18 +60,21 @@ class Price:
     currency: Currency
 
     def __str__(self):
-        return f'Price(price="{self.amount}", currency="{self.currency.name  }")'
+        return f'Price(price="{self.amount}", currency="{self.currency.name}")'
 
     def __repr__(self):
         return f'Price("{self.price}", "{self.currency.name}")'
-        
 
     def convert_to(self, other_currency: "Currency") -> "Price":
+        """
+        Converts the price to another currency
+
+        :return: The converted price in the other currency
+        """
         value = self.value / other_currency.value
-        if (value < 1):
+        if value < 1:
             value = 1
         else:
             value = round(value, 0)
 
         return Price(value, other_currency)
-

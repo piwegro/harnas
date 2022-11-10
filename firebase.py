@@ -20,10 +20,22 @@ class FirebaseUser:
 
     @classmethod
     def from_user_record(cls, user_record: auth.UserRecord):
+        """
+        Creates a User from a Firebase UserRecord
+
+        :param user_record:
+        :return: an instance of FirebaseUser
+        """
         return cls(user_record.uid, user_record.email, user_record.display_name)
 
     @classmethod
     def get_user_by_uid(cls, uid: str) -> "FirebaseUser":
+        """
+        Get a user by its id
+
+        :param uid: users id
+        :return: instance of FirebaseUser
+        """
         global firebase_app
         if firebase_app is None:
             raise FirebaseNotInitializedError()

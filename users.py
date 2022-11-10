@@ -22,8 +22,8 @@ class User:
     def get_user_by_id(cls, user_id: str) -> "User":
         """
         Get a user by its id
-        :param user_id: The id of the user
 
+        :param user_id: The id of the user
         :return: The user
         :raises UserNotFoundError: If the user does not exist
         :raises PostgresError: If the database error occurs
@@ -63,6 +63,7 @@ class User:
     def add_accepted_currency(self, currency: Currency) -> None:
         """
         Add an accepted currency to the user
+
         :param currency: Currency to add
         :return: None
         """
@@ -81,6 +82,11 @@ class User:
     #  the accepted_currencies list. Should also check whether the currency is already accepted. Should raise an
     #  exception if some database error occurs.
     def remove_accepted_currency(self, currency: Currency) -> None:
+        """
+        Remove an accepted currency from the user
+
+        :param currency: Currency to remove
+        """
         pass
 
     @classmethod
@@ -102,7 +108,6 @@ class User:
 
     def __str__(self):
         return f'User(user_id="{self.uid}", email="{self.email}", name="{self.name}", accepted_currencies={self.accepted_currencies})'
-
 
     def __repr__(self):
         return f'User("{self.uid}", "{self.email}", "{self.name}", {self.accepted_currencies})'

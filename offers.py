@@ -25,19 +25,41 @@ class Offer:
     # TODO: Should add an offer to the database and then return the offer
     @classmethod
     def new_offer(cls, title: str, description: str, price: Price, seller: User, images: list[str]) -> "Offer":
+        """
+        Create a new offer
+
+        :param title:
+        :param description:
+        :param price:
+        :param seller:
+        :param images:
+        :return: an offer
+        """
         return cls("", "", "", Price(0, Currency("", "", 1.0)), User("", "", "", []), [], datetime.now())
 
     @classmethod
     def new_offer_from_row(cls, raw_offer) -> "Offer":
+        """
+        Create a new offer from a row of the database
+
+        :param raw_offer:
+        :return: an offer
+        """
         return cls(raw_offer[0], raw_offer[2], raw_offer[3],
                    Price(raw_offer[4], Currency.get_currency_by_symbol(raw_offer[5])),
                    User.get_user_by_id(raw_offer[1]), raw_offer[6], raw_offer[7])
 
     @classmethod
     def get_all_offers(cls) -> list["Offer"]:
+        """
+        Get all offers from the database
+
+        :return: list of offers
+        :raises: PostgresError if there is no offers in the database
+        """
         result = fetch("SELECT * FROM offers", ())
         if result is None or len(result) == 0:
-            raise CurrencyNotFoundError("No offers found")
+            raise PostgresError("No offers found")
 
         listOfOffers = []
 
@@ -48,16 +70,23 @@ class Offer:
 
     @classmethod
     def get_offer_by_id(cls, offer_id: str) -> "Offer":
+        """
+        Get an offer by its id
+
+        :param offer_id:
+        :return: an offer
+        :raises: PostgresError: if there is no offer with the given id
+        """
         result = fetch("SELECT * from offers WHERE id = %s", (offer_id,))
         if result is None or len(result)== 0:
-            raise CurrencyNotFoundError("No offers found")
+            raise PostgresError("No offers found")
 
         if len(result) > 1:
             raise PostgresError("More than one offer with the same id")
 
         raw_offer = result[0]
         if raw_offer is None:
-            raise CurrencyNotFoundError("No offers found")
+            raise PostgresError("No offers found")
 
 
         offer = cls.new_offer_from_row(raw_offer)
@@ -65,14 +94,21 @@ class Offer:
 
     @classmethod
     def get_offers_by_user_id(cls, user_id: str) -> list["Offer"]:
+        """
+        Get all offers from the database
+
+        :param user_id:
+        :return: an offer
+        :raises PostgresError is there is no offer from the user
+        """
         result = fetch("SELECT * from offers WHERE seller_id = %s", (user_id,))
 
         if result is None or len(result) == 0:
-            raise CurrencyNotFoundError("No offers found")
+            raise PostgresError("No offers found")
 
         raw_offer = result[0]
         if raw_offer is None:
-            raise CurrencyNotFoundError("No offers found")
+            raise PostgresError("No offers found")
 
         listOfOffers = []
         for offer in result:
