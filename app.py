@@ -4,7 +4,7 @@ from users import User
 from currencies import Currency
 from firebase import FirebaseUser, initialize_firebase
 from health import check_health
-
+from messages import Message
 
 app = Flask(__name__)
 initialize_firebase()
@@ -66,15 +66,32 @@ def handle_update_user(user_id: str):
 
 # MESSAGES
 # Get all messages from and to a user
-@app.route("/user/<id>/conversations", methods=["GET"])
+@app.route("/user/<user_id>/conversations", methods=["GET"])
 def handle_get_user_conversations(user_id: str):
-    return "WIP"
+    result = Message.get_messages_by_user_id(user_id)
+    return result
 
 
 # Send a single new message to another user
 @app.route("/message", methods=["POST"])
-def handle_send_message(req):
-    return "WIP"
+def handle_send_message():
+    data = request.get_json()
+    m = None
+
+    try:
+        sender_id = data["sender_id"]
+        receiver_id = data["receiver_id"]
+        content = data["content"]
+    except KeyError:
+        return "Missing parameter", 400
+
+    try:
+        m = Message.new_message_with_ids(sender_id, receiver_id, content)
+        m.send()
+    except Exception as e:
+        return "Error: " + str(e), 500
+
+    return vars(m)
 
 
 # CURRENCIES

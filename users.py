@@ -103,6 +103,5 @@ class User:
     def __str__(self):
         return f'User(user_id="{self.uid}", email="{self.email}", name="{self.name}", accepted_currencies={self.accepted_currencies})'
 
-
     def __repr__(self):
         return f'User("{self.uid}", "{self.email}", "{self.name}", {self.accepted_currencies})'
