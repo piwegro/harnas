@@ -3,14 +3,12 @@ from typing import Optional
 from users import User
 
 # Exceptions import
-from exc import MessageAlreadySentError
+from exc import MessageAlreadySentError, UserNotFoundError
 
 # Functions import
 from datetime import datetime
 from dataclasses import dataclass
 from db import execute, fetch
-
-from exc import UserNotFoundError
 
 
 @dataclass(init=True, eq=True, order=True, unsafe_hash=False, frozen=False)
