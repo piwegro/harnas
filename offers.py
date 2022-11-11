@@ -5,9 +5,9 @@ from users import User
 from currencies import Currency, Price
 
 # Exceptions
-from exc import PostgresError, CurrencyNotFoundError
+from exc import OfferNotFoundError
 
-# functions import
+# Functions import
 from db import fetch
 
 
@@ -35,8 +35,6 @@ class Offer:
     @classmethod
     def get_all_offers(cls) -> list["Offer"]:
         result = fetch("SELECT * FROM offers", ())
-        if result is None or len(result) == 0:
-            raise CurrencyNotFoundError("No offers found")
 
         list_of_offers = []
 
@@ -49,14 +47,11 @@ class Offer:
     def get_offer_by_id(cls, offer_id: str) -> "Offer":
         result = fetch("SELECT * from offers WHERE id = %s", (offer_id,))
         if result is None or len(result) == 0:
-            raise CurrencyNotFoundError("No offers found")
-
-        if len(result) > 1:
-            raise PostgresError("More than one offer with the same id")
+            raise OfferNotFoundError(f"Offer with id {offer_id} not found")
 
         raw_offer = result[0]
         if raw_offer is None:
-            raise CurrencyNotFoundError("No offers found")
+            raise OfferNotFoundError(f"Offer with id {offer_id} not found")
 
         offer = cls.new_offer_from_row(raw_offer)
         return offer
@@ -66,11 +61,11 @@ class Offer:
         result = fetch("SELECT * from offers WHERE seller_id = %s", (user_id,))
 
         if result is None or len(result) == 0:
-            raise CurrencyNotFoundError("No offers found")
+            raise OfferNotFoundError(f"No offers found for user {user_id}")
 
         raw_offer = result[0]
         if raw_offer is None:
-            raise CurrencyNotFoundError("No offers found")
+            raise OfferNotFoundError(f"No offers found for user {user_id}")
 
         list_of_offers = []
         for offer in result:
