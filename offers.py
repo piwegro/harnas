@@ -117,7 +117,6 @@ class Offer:
         return listOfOffers
 
 
-
     def __str__(self):
         return f'Offer(id="{self.id}", title="{self.title}", description="{self.description}", ' \
                f'price="{self.price.amount}", currency="{self.price.currency.symbol}", seller\' id="{self.seller.uid}", ' \
