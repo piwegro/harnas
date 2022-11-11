@@ -4,7 +4,8 @@ from users import User
 from currencies import Currency
 from firebase import FirebaseUser, initialize_firebase
 from health import check_health
-
+from messages import Message
+from offers import Offer
 
 app = Flask(__name__)
 initialize_firebase()
@@ -14,7 +15,7 @@ initialize_firebase()
 # Get a single offer by  its id
 @app.route("/offer/<id>", methods=["GET"])
 def hande_get_offer_by_id(offer_id: str):
-    return "WIP"
+    return vars(Offer.get_offer_by_id(offer_id))
 
 
 # Get all offers for a query (paginated)
@@ -26,13 +27,13 @@ def handle_get_offers_by_query(query: str, page: str):
 # Get all offers (paginated)
 @app.route("/offers/<page>", methods=["GET"])
 def handle_get_all_offers():
-    return "WIP"
+    return vars(Offer.get_all_offers())
 
 
 # Get all offers by a user id (not paginated)
 @app.route("/user/<id>/offers", methods=["GET"])
 def handle_get_offers_by_user_id(user_id: str):
-    return "WIP"
+    return vars(Offer.get_offers_by_user_id(user_id))
 
 
 # ADDING OFFERS
@@ -66,15 +67,32 @@ def handle_update_user(user_id: str):
 
 # MESSAGES
 # Get all messages from and to a user
-@app.route("/user/<id>/conversations", methods=["GET"])
+@app.route("/user/<user_id>/conversations", methods=["GET"])
 def handle_get_user_conversations(user_id: str):
-    return "WIP"
+    result = Message.get_messages_by_user_id(user_id)
+    return result
 
 
 # Send a single new message to another user
 @app.route("/message", methods=["POST"])
-def handle_send_message(req):
-    return "WIP"
+def handle_send_message():
+    data = request.get_json()
+    m = None
+
+    try:
+        sender_id = data["sender_id"]
+        receiver_id = data["receiver_id"]
+        content = data["content"]
+    except KeyError:
+        return "Missing parameter", 400
+
+    try:
+        m = Message.new_message_with_ids(sender_id, receiver_id, content)
+        m.send()
+    except Exception as e:
+        return "Error: " + str(e), 500
+
+    return vars(m)
 
 
 # CURRENCIES
