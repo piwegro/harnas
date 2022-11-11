@@ -61,9 +61,9 @@ class Message:
         """
         Sends the message to the database.
 
-        :raise ValueError: If the message is already sent.
+        :raises MessageAlreadySentError: If the message has already been sent.
+        :raises RuntimeError: If the message has not been created yet.
         """
-        # TODO: Different exception type
         if self.is_sent:
             raise MessageAlreadySentError(self)
 
@@ -110,4 +110,5 @@ class Message:
         return f"Message {self.message_id} from {self.sender.uid} to {self.receiver.uid} at {self.sent_at}"
 
     def __repr__(self) -> str:
-        return f'Message("{self.message_id}", "{self.sender.uid}", "{self.receiver.uid}", "{self.content}", "{self.sent_at}")'
+        return f'Message("{self.message_id}", "{self.sender.uid}", "{self.receiver.uid}", ' \
+               f'"{self.content}", "{self.sent_at}")'
