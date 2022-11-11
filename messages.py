@@ -1,8 +1,12 @@
+# Types import
 from typing import Optional
-
-from datetime import datetime
-
 from users import User
+
+# Exceptions import
+from exc import MessageAlreadySentError
+
+# Functions import
+from datetime import datetime
 from dataclasses import dataclass
 from db import execute, fetch
 
@@ -55,7 +59,7 @@ class Message:
         """
         # TODO: Different exception type
         if self.is_sent:
-            raise ValueError("Message already sent")
+            raise MessageAlreadySentError(self)
 
         execute("INSERT INTO messages (sender_id, receiver_id, content, sent_at) VALUES (%s, %s, %s, %s)",
                 (self.sender.uid, self.receiver.uid, self.content, self.sent_at))
@@ -65,7 +69,7 @@ class Message:
                        (self.sender.uid, self.receiver.uid, self.content, self.sent_at))
 
         if result is None or len(result) == 0:
-            raise RuntimeError("Message not found")
+            raise RuntimeError("Count not send the message")
 
         self.message_id = result[0][0]
         self.is_sent = True
