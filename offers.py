@@ -1,16 +1,15 @@
 # Types import
 from datetime import datetime
-from currencies import Currency
 from dataclasses import dataclass
-from firebase import FirebaseUser
 from users import User
 from currencies import Currency, Price
 
 # Exceptions
-from exc import UserNotFoundError, PostgresError, CurrencyNotFoundError
+from exc import PostgresError, CurrencyNotFoundError
 
-#functions import
-from db import fetch, execute
+# functions import
+from db import fetch
+
 
 @dataclass(init=True, eq=True, order=True, unsafe_hash=False, frozen=False)
 class Offer:
@@ -39,17 +38,17 @@ class Offer:
         if result is None or len(result) == 0:
             raise CurrencyNotFoundError("No offers found")
 
-        listOfOffers = []
+        list_of_offers = []
 
         for offer in result:
-            listOfOffers.append(cls.new_offer_from_row(offer))
+            list_of_offers.append(cls.new_offer_from_row(offer))
 
-        return listOfOffers
+        return list_of_offers
 
     @classmethod
     def get_offer_by_id(cls, offer_id: str) -> "Offer":
         result = fetch("SELECT * from offers WHERE id = %s", (offer_id,))
-        if result is None or len(result)== 0:
+        if result is None or len(result) == 0:
             raise CurrencyNotFoundError("No offers found")
 
         if len(result) > 1:
@@ -58,7 +57,6 @@ class Offer:
         raw_offer = result[0]
         if raw_offer is None:
             raise CurrencyNotFoundError("No offers found")
-
 
         offer = cls.new_offer_from_row(raw_offer)
         return offer
@@ -74,12 +72,11 @@ class Offer:
         if raw_offer is None:
             raise CurrencyNotFoundError("No offers found")
 
-        listOfOffers = []
+        list_of_offers = []
         for offer in result:
-            listOfOffers.append(cls.new_offer_from_row(offer))
+            list_of_offers.append(cls.new_offer_from_row(offer))
 
-        return listOfOffers
-
+        return list_of_offers
 
     def __str__(self):
         return f'Offer(id="{self.id}", title="{self.title}", description="{self.description}", ' \
