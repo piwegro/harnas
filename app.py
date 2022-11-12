@@ -5,6 +5,7 @@ from currencies import Currency
 from firebase import FirebaseUser, initialize_firebase
 from health import check_health
 from messages import Message
+from offers import Offer
 
 app = Flask(__name__)
 initialize_firebase()
@@ -14,7 +15,7 @@ initialize_firebase()
 # Get a single offer by  its id
 @app.route("/offer/<id>", methods=["GET"])
 def hande_get_offer_by_id(offer_id: str):
-    return "WIP"
+    return vars(Offer.get_offer_by_id(offer_id))
 
 
 # Get all offers for a query (paginated)
@@ -26,13 +27,13 @@ def handle_get_offers_by_query(query: str, page: str):
 # Get all offers (paginated)
 @app.route("/offers/<page>", methods=["GET"])
 def handle_get_all_offers():
-    return "WIP"
+    return vars(Offer.get_all_offers())
 
 
 # Get all offers by a user id (not paginated)
 @app.route("/user/<id>/offers", methods=["GET"])
 def handle_get_offers_by_user_id(user_id: str):
-    return "WIP"
+    return vars(Offer.get_offers_by_user_id(user_id))
 
 
 # ADDING OFFERS
