@@ -1,6 +1,9 @@
+# Exceptions import
+from exc import CurrencyNotFoundError
+
+# Functions import
 from dataclasses import dataclass
 from db import fetch
-from exc import CurrencyNotFoundError
 
 
 @dataclass(init=True, eq=True, order=True, unsafe_hash=False, frozen=False)

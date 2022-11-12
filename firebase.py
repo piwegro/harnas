@@ -1,11 +1,13 @@
 import firebase_admin
 
-from os import environ
-
-from firebase_admin import credentials, auth
+# Exceptions import
 from exc import FirebaseNotInitializedError
 
+# Functions import
+from os import environ
+from firebase_admin import credentials, auth
 from dataclasses import dataclass
+
 
 SERVICE_ACCOUNT_PATH = environ["SERVICE_ACCOUNT_PATH"]
 
@@ -72,6 +74,7 @@ def verify_token(token: str):
         decoded_token = auth.verify_id_token(token, check_revoked=True)
         uid = decoded_token['uid']
         return uid
+    # TODO: Handle exceptions
     except auth.RevokedIdTokenError:
         return None
     except auth.UserDisabledError:

@@ -4,7 +4,7 @@ from dataclasses import dataclass
 from firebase import FirebaseUser
 
 # Exceptions
-from exc import UserNotFoundError, PostgresError, CurrencyNotFoundError
+from exc import UserNotFoundError, CurrencyNotFoundError
 
 # Functions import
 from db import fetch, execute
@@ -29,16 +29,10 @@ class User:
         :raises PostgresError: If the database error occurs
         """
         result = fetch("SELECT id, email, name FROM users WHERE id = %s", (user_id,))
-        if result is None or len(result) == 0:
+        if result is None or len(result) == 0 or result[0] is None:
             raise UserNotFoundError(user_id)
-
-        if len(result) > 1:
-            raise PostgresError("More than one user with the same id")
 
         raw_user = result[0]
-        if raw_user is None:
-            raise UserNotFoundError(user_id)
-
         user = cls(raw_user[0], raw_user[1], raw_user[2], [])
 
         result = fetch("SELECT name, symbol, exchange_rate FROM currencies WHERE symbol IN "
@@ -49,9 +43,6 @@ class User:
             # TODO: Probably an error if the user has no accepted currencies.
             #  Only possible when creating a user – should refactor
             print("No accepted currencies for user " + user_id)
-
-        if result is None:
-            raise PostgresError("Database error")
 
         for raw_currency in result:
             currency = Currency(raw_currency[0], raw_currency[1], raw_currency[2])
@@ -68,9 +59,7 @@ class User:
         :return: None
         """
         result = fetch("SELECT count(*) FROM currencies WHERE symbol = %s", (currency.symbol,))
-        if result is None or len(result) == 0:
-            raise PostgresError("Database error")
-        if result[0][0] == 0:
+        if result is None or len(result) == 0 or result[0][0] == 0:
             raise CurrencyNotFoundError(currency.symbol)
 
         result = execute("INSERT INTO accepted_currencies (user_id, currency_symbol) VALUES (%s, %s)",
