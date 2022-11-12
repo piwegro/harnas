@@ -24,6 +24,13 @@ def connect() -> None:
 
 
 def fetch(query: str, params: tuple):
+    """
+    Fetches a single row from the database.
+
+    :param query:
+    :param params:
+    :return:
+    """
     global connection
     if connection is None:
         connect()
@@ -36,6 +43,13 @@ def fetch(query: str, params: tuple):
 
 
 def execute(query: str, params: tuple):
+    """
+    Executes a query on the database.
+
+    :param query:
+    :param params:
+    :return:
+    """
     global connection
     if connection is None:
         connect()
