@@ -151,7 +151,7 @@ If the user is found:
     {
       "name": "Harna\u015b",
       "symbol": "HAR",
-      "value": 1
+      "value": 1.0
     }
   ],
   "email": "karol@kucza.xyz",
@@ -177,7 +177,7 @@ If the user is found:
     {
       "name": "Harna\u015b",
       "symbol": "HAR",
-      "value": 1
+      "value": 1.0
     }
   ],
   "email": "karol@kucza.xyz",
@@ -263,7 +263,7 @@ Response:
   {
     "name": "Harna\u015b",
     "symbol": "HAR",
-    "value": 1
+    "value": 1.0
   }
 ]
 ```
