@@ -43,6 +43,12 @@ def handle_add_offer():
     return "WIP"
 
 
+# Post images
+@app.route("/images", methods=["POST"])
+def handle_post_images():
+    return "WIP"
+
+
 # USER MANAGEMENT
 # Get a single user's info (including accepted currencies) by its id
 @app.route("/user/<user_id>", methods=["GET"])
@@ -108,10 +114,11 @@ def handle_get_all_currencies():
 @app.route("/health", methods=["GET"])
 def handle_health():
     status, message = check_health()
+    status_code = 200 if status else 500
     return {
         "healthy": status,
         "message": message
-    }
+    }, status_code
 
 
 # Handle root queries
