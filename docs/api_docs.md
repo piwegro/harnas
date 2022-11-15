@@ -280,41 +280,58 @@ If the internal server error occurs:
 ### GET `/offers/search/<query>/<page>`
 Returns offers matching given query.
 
-Response:
-200 OK
-```json
-INSERT EXAMPLE RESPONSE HERE
-```
-
-If the internal server error occurs:
-500 Internal Server Error
+**WIP**
 
 ### GET `/offers/<page>`
 Returns offers from given page.
 
-Response:
-200 OK
-```json
-INSERT EXAMPLE RESPONSE HERE
+Standard response:
+**200 OK**
+
+#### Response
+```
+[
+  <Offer>,
+  <Offer>,
+  ...
+]
 ```
 
 If the internal server error occurs:
-500 Internal Server Error
+**500 Internal Server Error**
+#### Response
+```
+<Error>
+```
 
 ### GET `/user/<id>/offers`
 Returns offers from given user.
 
-If the user id is correct:
-200 OK
-```json
-INSERT EXAMPLE RESPONSE HERE
+If the user is is correct:
+**200 OK**
+
+#### Response
+```
+[
+  <Offer>,
+  <Offer>,
+  ...
+]
 ```
 
-If the user id is incorrect:
-400 Bad Request
+If the user is not found:
+**400 Bad Request**
+#### Response
+```
+<Error>
+```
 
 If the internal server error occurs:
-500 Internal Server Error
+**500 Internal Server Error**
+#### Response
+```
+<Error>
+```
 
 ### POST `/offer`
 Creates new offer.
@@ -495,11 +512,50 @@ Updates the user with given id.
 **WIP**
 
 ### GET `/user/<id>/conversations`
-Returns conversations from given user.
+Returns conversations for a given user.
 
+If the user is found:
+**200 OK**
+
+#### Response
+```json
+[
+  <Message>,
+  <Message>
+]
+```
+
+If the user is not found:
+**400 Bad Request**
+
+#### Response
+```
+<Error>
+```
+
+If the internal server error occurs:
+**500 Internal Server Error**
+
+#### Response
+```
+<Error>
+```
 
 ### POST `/message`
 Creates new message.
+
+#### Request
+```json
+{
+    "sender_id": <string>,
+    "receiver_id": <string>,
+    "content": <string>
+}
+```
+
+`sender_id`: unique ID of the sender \
+`conversation_id`: unique ID of the conversation \
+`content`: content of the message
 
 Example request:
 ```json
@@ -510,7 +566,14 @@ Example request:
 }
 ```
 
-If sending the message is successful: 200 OK
+If sending the message is successful: **200 OK**
+
+#### Response
+```
+<Message>
+```
+
+#### Example response
 ```json
 {
     "content": "Dupa 12345",
@@ -545,10 +608,18 @@ If sending the message is successful: 200 OK
 ```
 
 If at least one of the users is not found:
-400 Bad Request
+**400 Bad Request**
+#### Response
+```
+<Error>
+```
 
 If the internal server error occurs:
-500 Internal Server Error
+**500 Internal Server Error**
+#### Response
+```
+<Error>
+```
 
 
 ### GET `/currencies`
