@@ -3,17 +3,18 @@ from datetime import datetime
 from dataclasses import dataclass
 from users import User
 from currencies import Currency, Price
+from typing import Optional
 
 # Exceptions
-from exc import OfferNotFoundError
+from exc import OfferNotFoundError, UserNotFoundError, CurrencyNotFoundError, PostgresError
 
 # Functions import
-from db import fetch
+from db import fetch, execute
 
 
 @dataclass(init=True, eq=True, order=True, unsafe_hash=False, frozen=False)
 class Offer:
-    id: str
+    id: Optional[str]
     title: str
     description: str
     price: Price
@@ -21,32 +22,88 @@ class Offer:
     images: list[str]
     created_at: datetime
 
-    # TODO: Should add an offer to the database and then return the offer
+    is_added = property(lambda self: self.id is not None)
+
     @classmethod
     def new_offer(cls, title: str, description: str, price: Price, seller: User, images: list[str]) -> "Offer":
         """
-        Create a new offer
+        Creates a new offer.
 
-        :param title:
-        :param description:
-        :param price:
-        :param seller:
-        :param images:
-        :return: an offer
+        :param title: The title of the offer.
+        :param description: The description of the offer.
+        :param price: The price of the offer.
+        :param seller: The seller.
+        :param images: The list of links to the images.
+        :return: The new offer.
         """
-        return cls("", "", "", Price(0, Currency("", "", 1.0)), User("", "", "", []), [], datetime.now())
+        return cls(None, title, description, price, seller, images, datetime.now())
+
+    @classmethod
+    def new_offer_with_id(cls, title: str, description: str, currency_symbol: str, amount: int,
+                          seller_id: str, images: list[str]) -> "Offer":
+        """
+        Creates a new offer, but with seller id instead of seller object.
+
+        :param title: The title of the offer.
+        :param description: The description of the offer.
+        :param currency_symbol: The symbol of the currency.
+        :param amount: The amount of the currency.
+        :param seller_id: The id of the seller.
+        :param images: The list of links to the images.
+        :raises UserNotFoundError: If the user with the given id does not exist.
+        :raises CurrencyNotFoundError: If the currency with the given symbol does not exist.
+        :return: The new offer.
+        """
+        try:
+            seller = User.get_user_by_id(seller_id)
+            currency = Currency.get_currency_by_symbol(currency_symbol)
+        except UserNotFoundError:
+            raise
+        except CurrencyNotFoundError:
+            raise
+
+        return cls(None, title, description, Price(amount, currency), seller, images, datetime.now())
 
     @classmethod
     def new_offer_from_row(cls, raw_offer) -> "Offer":
         """
-        Create a new offer from a row of the database
+                Create a new offer from a row of the database
 
-        :param raw_offer:
-        :return: an offer
-        """
+                :param raw_offer:
+                :return: an offer
+                """
+        try:
+            currency = Currency.get_currency_by_symbol(raw_offer[4])
+            user = User.get_user_by_id(raw_offer[1])
+        except UserNotFoundError:
+            raise
+        except CurrencyNotFoundError:
+            raise
+
         return cls(raw_offer[0], raw_offer[2], raw_offer[3],
-                   Price(raw_offer[4], Currency.get_currency_by_symbol(raw_offer[5])),
-                   User.get_user_by_id(raw_offer[1]), raw_offer[6], raw_offer[7])
+                   Price(raw_offer[4], currency), user, raw_offer[6], raw_offer[7])
+
+    def add(self) -> None:
+        """
+        Adds the offer to the database.
+
+        :raises PostgresError: If the offer could not be added to the database.
+        """
+        execute("INSERT INTO offers (seller_id, name, description, price, currency, images, created_at) "
+                "VALUES (%s, %s, %s, %s, %s, %s, %s)",
+                (self.seller.uid, self.title, self.description, self.price.amount, self.price.currency.symbol,
+                 self.images, self.created_at))
+
+        result = fetch("SELECT id FROM offers WHERE seller_id = %s AND name = %s AND description = %s "
+                       "AND price = %s AND currency = %s AND images = %s AND created_at = %s "
+                       "ORDER BY created_at DESC LIMIT 1",
+                       (self.seller.uid, self.title, self.description, self.price.amount,
+                        self.price.currency.symbol, self.images, self.created_at))
+
+        if result is None or len(result) == 0:
+            raise PostgresError("The offer was not added to the database.")
+
+        self.id = result[0][0]
 
     @classmethod
     def get_all_offers(cls) -> list["Offer"]:
@@ -104,7 +161,6 @@ class Offer:
         raw_offer = result[0]
         if raw_offer is None:
             raise OfferNotFoundError(f"No offers found for user {user_id}")
-
 
         list_of_offers = []
         for offer in result:
