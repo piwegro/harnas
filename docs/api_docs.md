@@ -115,7 +115,7 @@ At first we declare some primitive types:
 
 ```json
 {
-  "created_at": "Mon, 31 Oct 2022 18:32:19 GMT",
+  "created_at": "2019-05-18T15:17:00+00:00",
   "description": "Bardzo \u0142adna p\u00f3\u0142eczka we wspania\u0142ym stanie",
   "id": 1,
   "images": [],
@@ -189,7 +189,7 @@ At first we declare some primitive types:
         "name": "Karol",
         "uid": "KyumBFaY66ZdS3oG7fPZQZycKyC2"
     },
-    "sent_at": "Sun, 13 Nov 2022 11:21:40 GMT"
+    "sent_at": "2019-05-18T15:17:00+00:00"
 }
 ```
 
@@ -208,6 +208,9 @@ At first we declare some primitive types:
   "error": "User with given email already exists"
 }
 ```
+
+## Date and time format
+All dates and times are formatted in the ISO 8601 format, e.g. `2019-05-18T15:17:00+00:00`.
 
 ## Authorization
 For the endpoints that require authorization, the `Authorization` header needs to be provided with the value 
@@ -270,7 +273,10 @@ The responses in case of 5XX errors are **not** guaranteed.
 ### GET `/offer/<id>`
 Returns offer with given id.
 
-#### Autorization
+#### Parameters
+`id`: id of the offer
+
+#### Authorization
 None
 
 #### Responses
@@ -286,7 +292,7 @@ The offer with a given id was found.
 ###### Example response body
 ```json
 {
-  "created_at": "Mon, 31 Oct 2022 18:32:19 GMT",
+  "created_at": "2019-05-18T15:17:00+00:00",
   "description": "Bardzo \u0142adna p\u00f3\u0142eczka we wspania\u0142ym stanie",
   "id": 1,
   "images": [],
@@ -321,9 +327,12 @@ The offer with a given id was not found.
 ```
 
 ### GET `/offers/search/<query>/<page>`
-Returns offers matching given query.
+Returns offers matching given query. 
+Page with id 0 is the page with the most fitting offers.
 
-Page with id 0 is the page with the most fitting offers and is always valid.
+#### Parameters
+`query`: query to search for \
+`page`: page of the results, 0 is always valid
 
 #### Authorization
 None
@@ -358,6 +367,9 @@ The page number is invalid.
 ### GET `/offers/<page>`
 Returns offers from given page. Page with id 0 is the newest page and is always valid.
 
+#### Parameters
+`page`: page of the results, 0 is always valid
+
 #### Authorization
 None
 
@@ -390,6 +402,9 @@ The page id is invalid.
 
 ### GET `/user/<id>/offers`
 Returns offers from given user.
+
+#### Parameters
+`id`: id of the user
 
 #### Authorization
 None
@@ -464,7 +479,7 @@ Needs to be authorized as any user.
 ###### Example response body
 ```json
 {
-    "created_at": "Sun, 13 Nov 2022 11:12:03 GMT",
+    "created_at": "2019-05-18T15:17:00+00:00",
     "description": "Example description of this beautiful offer",
     "id": 3,
     "images": [],
@@ -516,6 +531,9 @@ Needs to be authorized as any user.
 ### GET `/user/<id>`
 Returns user with given id.
 
+#### Parameters
+`id`: id of the user
+
 #### Authorization
 None
 
@@ -554,6 +572,9 @@ The user with a given id does not exist.
 
 ### PUT `/user/<id>`
 Puts the user with given id. Should be called after the user is created.
+
+#### Parameters
+`id`: id of the user
 
 #### Authorization
 None
@@ -603,6 +624,9 @@ The user with a given id already exists in the internal database.
 ### PATCH `/user/<id>`
 Updates the user with given id.
 
+#### Parameters
+`id`: id of the user
+
 #### Authorization
 Needs to be authorized as the user with given id.
 
@@ -610,6 +634,9 @@ Needs to be authorized as the user with given id.
 
 ### GET `/user/<id>/conversations`
 Returns conversations for a given user.
+
+#### Parameters
+`id`: id of the user
 
 #### Responses
 
@@ -631,8 +658,9 @@ The user id is invalid.
 <Error>
 ```
 
+
 ### POST `/message`
-Creates new message.
+Creates and send a new message.
 
 #### Authorization
 Needs to be authorized as a sender.
@@ -697,7 +725,7 @@ When the message was created and sent.
         "name": "Karol",
         "uid": "KyumBFaY66ZdS3oG7fPZQZycKyC2"
     },
-    "sent_at": "Sun, 13 Nov 2022 11:21:40 GMT"
+    "sent_at": "2019-05-18T15:17:00+00:00"
 }
 ```
 
@@ -766,7 +794,7 @@ The server is unhealthy.
 ```json
 {
   "healthy": false,
-  "message": <str>
+  "message": <string>
 }
 ```
 
