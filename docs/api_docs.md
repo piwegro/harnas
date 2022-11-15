@@ -164,7 +164,7 @@ At first we declare some primitive types:
 #### Example object
 ```json
 {
-    "content": "Dupa 12345",
+    "content": "Example message",
     "is_sent": true,
     "message_id": 7,
     "receiver": {
@@ -447,8 +447,8 @@ Needs to be authorized as any user.
     "seller_id": "KyumBFaY66ZdS3oG7fPZQZycKyC2",
     "currency": "HAR",
     "price": 2,
-    "title": "Dupa jasia",
-    "description": "Debil"
+    "title": "Beautiful offer",
+    "description": "Example description of this beautiful offer"
 }
 ```
 
@@ -465,7 +465,7 @@ Needs to be authorized as any user.
 ```json
 {
     "created_at": "Sun, 13 Nov 2022 11:12:03 GMT",
-    "description": "Debil",
+    "description": "Example description of this beautiful offer",
     "id": 3,
     "images": [],
     "price": {
@@ -487,7 +487,7 @@ Needs to be authorized as any user.
         "name": "Karol",
         "uid": "KyumBFaY66ZdS3oG7fPZQZycKyC2"
     },
-    "title": "Test jasia"
+    "title": "Beautiful offer"
 }
 ```
 
@@ -672,7 +672,7 @@ When the message was created and sent.
 ###### Example response body
 ```json
 {
-    "content": "Test 12345",
+    "content": "Example test message",
     "is_sent": true,
     "message_id": 7,
     "receiver": {
