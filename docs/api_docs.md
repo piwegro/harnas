@@ -98,7 +98,8 @@ At first we declare some primitive types:
   "images": <array[<string>]>,
   "price": <Price>,
   "seller": <User>,
-  "title": <string>
+  "title": <string>,
+  "location": <string>
 }
 ```
 
@@ -108,7 +109,8 @@ At first we declare some primitive types:
 `images`: array of image urls \
 `price`: price of the offer \
 `seller`: user that created the offer \
-`title`: title of the offer
+`title`: title of the offer \
+`location`: location of the offer (textual)
 
 
 #### Example object
@@ -138,7 +140,8 @@ At first we declare some primitive types:
     "name": "Karol",
     "uid": "KyumBFaY66ZdS3oG7fPZQZycKyC2"
   },
-  "title": "P\u00f3\u0142eczka"
+  "title": "P\u00f3\u0142eczka",
+  "location": "Gda\u0144sk"
 }
 ```
 
@@ -319,7 +322,8 @@ The offer with a given id was found.
     "name": "Karol",
     "uid": "KyumBFaY66ZdS3oG7fPZQZycKyC2"
   },
-  "title": "P\u00f3\u0142eczka"
+  "title": "P\u00f3\u0142eczka",
+  "location": "Gda\u0144sk"
 }
 ```
 ##### 404 Not Found
@@ -450,7 +454,8 @@ Needs to be authorized as any user.
     "currency": <string>,
     "price": <int>,
     "title": <string>,
-    "description": <string>
+    "description": <string>,
+    "location": <string>
 }
 ```
 
@@ -458,7 +463,8 @@ Needs to be authorized as any user.
 `currency`: symbol of the currency \
 `price`: amount of the currency \
 `title`: title of the offer \
-`description`: description
+`description`: description \
+`location`: location of the offer
 
 ##### Example request
 ```json
@@ -467,7 +473,8 @@ Needs to be authorized as any user.
     "currency": "HAR",
     "price": 2,
     "title": "Beautiful offer",
-    "description": "Example description of this beautiful offer"
+    "description": "Example description of this beautiful offer",
+    "location": "Gdańsk"
 }
 ```
 
@@ -506,7 +513,8 @@ Needs to be authorized as any user.
         "name": "Karol",
         "uid": "KyumBFaY66ZdS3oG7fPZQZycKyC2"
     },
-    "title": "Beautiful offer"
+    "title": "Beautiful offer",
+    "location": "Gda\u0144sk"
 }
 ```
 
