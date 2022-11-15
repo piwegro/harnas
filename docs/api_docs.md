@@ -64,14 +64,12 @@ At first we declare some primitive types:
     <Currency>,
     <Currency>
   ],
-  "email": <string>,
   "name": <string>,
   "uid": <string>
 }
 ```
 
 `accepted_currencies`: currencies accepted by the user \
-`email`: user email address\
 `name`: user-readable name of the user \
 `uid`: unique id of the user
 
@@ -85,7 +83,6 @@ At first we declare some primitive types:
       "value": 1.0
     }
   ],
-  "email": "karol@kucza.xyz",
   "name": "Karol",
   "uid": "KyumBFaY66ZdS3oG7fPZQZycKyC2"
 }
@@ -138,7 +135,6 @@ At first we declare some primitive types:
         "value": 1
       }
     ],
-    "email": "karol@kucza.xyz",
     "name": "Karol",
     "uid": "KyumBFaY66ZdS3oG7fPZQZycKyC2"
   },
@@ -179,7 +175,6 @@ At first we declare some primitive types:
                 "value": 1.0
             }
         ],
-        "email": "john.doe@example.com",
         "name": "John",
         "uid": "iELOTJC3k6VMCrrtamFq7907REz1"
     },
@@ -191,7 +186,6 @@ At first we declare some primitive types:
                 "value": 1.0
             }
         ],
-        "email": "karol@kucza.xyz",
         "name": "Karol",
         "uid": "KyumBFaY66ZdS3oG7fPZQZycKyC2"
     },
@@ -206,7 +200,7 @@ At first we declare some primitive types:
 }
 ```
 
-`error`: error message
+`error`: user-readable error message
 
 #### Example object
 ```json
@@ -215,6 +209,59 @@ At first we declare some primitive types:
 }
 ```
 
+## Authorization
+For the endpoints that require authorization, the `Authorization` header needs to be provided with the value 
+of `Bearer <token>`, where `<token>` is the token obtained from the Google Firebase Auth API.
+
+
+## General responses
+Those responses might be returned by any endpoint (are not specific to any endpoint).
+
+### 500 Internal Server Error
+Might be returned if the server is unable to process the request because of
+an internal issue and not because of the request itself.
+
+#### Response
+```
+<Error>
+```
+
+#### Example response
+```json
+{
+  "error": "The database cannot be accessed"
+}
+```
+
+### 401 Unauthorized
+Is returned when the authentication token is missing or invalid.
+
+#### Response
+```
+<Error>
+```
+
+#### Example response
+```json
+{
+  "error": "The 'Authorization' header is missing"
+}
+```
+
+### 403 Forbidden
+Is returned when the user is not authorized to perform the requested action.
+
+#### Response
+```
+<Error>
+```
+
+#### Example response
+```json
+{
+  "error": "You are not authorized to perform this action"
+}
+```
 
 ## Endpoints
 
@@ -223,15 +270,20 @@ The responses in case of 5XX errors are **not** guaranteed.
 ### GET `/offer/<id>`
 Returns offer with given id.
 
-If the offer is found:
-**200 OK**
+#### Autorization
+None
 
-#### Response
+#### Responses
+
+##### 200 OK
+The offer with a given id was found.
+
+###### Response body
 ```
 <Offer>
 ```
 
-#### Example response
+###### Example response body
 ```json
 {
   "created_at": "Mon, 31 Oct 2022 18:32:19 GMT",
@@ -254,25 +306,16 @@ If the offer is found:
         "value": 1
       }
     ],
-    "email": "karol@kucza.xyz",
     "name": "Karol",
     "uid": "KyumBFaY66ZdS3oG7fPZQZycKyC2"
   },
   "title": "P\u00f3\u0142eczka"
 }
 ```
+##### 404 Not Found
+The offer with a given id was not found.
 
-If the offer is not found:
-**400 Bad Request**
-
-#### Response
-```
-<Error>
-```
-
-If the internal server error occurs:
-**500 Internal Server Error**
-#### Response
+###### Response body
 ```
 <Error>
 ```
@@ -280,15 +323,49 @@ If the internal server error occurs:
 ### GET `/offers/search/<query>/<page>`
 Returns offers matching given query.
 
-**WIP**
+Page with id 0 is the page with the most fitting offers and is always valid.
+
+#### Authorization
+None
+
+#### Responses
+
+##### 200 OK
+
+###### Response body
+```json
+[
+    <Offer>,
+    <Offer>,
+    ...
+]
+```
+
+###### Additional headers
+| Header          | Description           |
+|-----------------|-----------------------|
+| `X-Total-Pages` | Total number of pages |
+
+##### 400 Bad Request
+The page number is invalid.
+
+###### Response body
+```
+<Error>
+```
+
 
 ### GET `/offers/<page>`
-Returns offers from given page.
+Returns offers from given page. Page with id 0 is the newest page and is always valid.
 
-Standard response:
-**200 OK**
+#### Authorization
+None
 
-#### Response
+#### Responses
+
+##### 200 OK
+
+###### Response body
 ```
 [
   <Offer>,
@@ -297,20 +374,32 @@ Standard response:
 ]
 ```
 
-If the internal server error occurs:
-**500 Internal Server Error**
-#### Response
+###### Additional headers
+| Header          | Description           |
+|-----------------|-----------------------|
+| `X-Total-Pages` | Total number of pages |
+
+##### 400 Bad Request
+The page id is invalid.
+
+###### Response body
 ```
 <Error>
 ```
+
 
 ### GET `/user/<id>/offers`
 Returns offers from given user.
 
-If the user is is correct:
-**200 OK**
+#### Authorization
+None
 
-#### Response
+#### Responses
+
+##### 200 OK
+The user with a given id was found.
+
+###### Response body
 ```
 [
   <Offer>,
@@ -319,22 +408,21 @@ If the user is is correct:
 ]
 ```
 
-If the user is not found:
-**400 Bad Request**
-#### Response
+
+##### 400 Bad Request
+The user id is invalid.
+
+###### Response body
 ```
 <Error>
 ```
 
-If the internal server error occurs:
-**500 Internal Server Error**
-#### Response
-```
-<Error>
-```
 
 ### POST `/offer`
 Creates new offer.
+
+#### Authorization
+Needs to be authorized as any user.
 
 #### Request
 ```json
@@ -353,7 +441,7 @@ Creates new offer.
 `title`: title of the offer \
 `description`: description
 
-#### Example request
+##### Example request
 ```json
 {
     "seller_id": "KyumBFaY66ZdS3oG7fPZQZycKyC2",
@@ -364,15 +452,16 @@ Creates new offer.
 }
 ```
 
-If the offer is created: 
-**200 OK**
+#### Responses
 
-#### Response
+##### 201 Created
+
+###### Response body
 ```
 <Offer>
 ```
 
-#### Example response
+###### Example response body
 ```json
 {
     "created_at": "Sun, 13 Nov 2022 11:12:03 GMT",
@@ -395,43 +484,52 @@ If the offer is created:
                 "value": 1.0
             }
         ],
-        "email": "karol@kucza.xyz",
         "name": "Karol",
         "uid": "KyumBFaY66ZdS3oG7fPZQZycKyC2"
     },
-    "title": "Dupa jasia"
+    "title": "Test jasia"
 }
 ```
 
-If the seller id is incorrect or if the currency is not accepted:
-**400 Bad Request**
+#### 400 Bad Request
+Probable causes
+- invalid seller id
+- invalid currency
+- currency not accepted by the seller
+- invalid price
+- invalid image id
+
 #### Response
 ```
 <Error>
 ```
 
-If the internal server error occurs:
-**500 Internal Server Error**
-#### Response
-```
-<Error>
-```
 
 ### POST `/images`
+Uploads new image.
+
+#### Authorization
+Needs to be authorized as any user.
+
 **WIP**
 
 ### GET `/user/<id>`
 Returns user with given id.
 
-If the user is found:
-**200 OK**
+#### Authorization
+None
 
-#### Response
+#### Responses
+
+##### 200 OK
+The user with a given id was found.
+
+###### Response body
 ```
 <User>
 ```
 
-#### Example response
+###### Example response body
 ```json
 {
   "accepted_currencies": [
@@ -441,24 +539,15 @@ If the user is found:
       "value": 1.0
     }
   ],
-  "email": "karol@kucza.xyz",
   "name": "Karol",
   "uid": "KyumBFaY66ZdS3oG7fPZQZycKyC2"
 }
 ```
 
-If the user is not found:
-**400 Bad Request**
+##### 404 Not Found
+The user with a given id does not exist.
 
-#### Response
-```
-<Error>
-```
-
-If the internal server error occurs:
-**500 Internal Server Error**
-
-#### Response
+###### Response body
 ```
 <Error>
 ```
@@ -466,15 +555,20 @@ If the internal server error occurs:
 ### PUT `/user/<id>`
 Puts the user with given id. Should be called after the user is created.
 
-If the user is found:
-**200 OK**
+#### Authorization
+None
 
-#### Response
+#### Responses
+
+##### 201 Created
+The user with a given id was created in the internal database.
+
+###### Response body
 ```
 <User>
 ```
 
-#### Example response
+###### Example response body
 ```json
 {
   "accepted_currencies": [
@@ -484,40 +578,44 @@ If the user is found:
       "value": 1.0
     }
   ],
-  "email": "karol@kucza.xyz",
   "name": "Karol",
   "uid": "KyumBFaY66ZdS3oG7fPZQZycKyC2"
 }
 ```
 
-If the user is not found:
-**400 Bad Request**
+##### 400 Bad Request
+The user with a given id does not exist in the Firebase Auth database.
 
-#### Response
+###### Response body
 ```
 <Error>
 ```
 
-If the internal server error occurs:
-**500 Internal Server Error**
+##### 409 Conflict
+The user with a given id already exists in the internal database.
 
-#### Response
+###### Response body
 ```
 <Error>
 ```
+
 
 ### PATCH `/user/<id>`
 Updates the user with given id.
+
+#### Authorization
+Needs to be authorized as the user with given id.
 
 **WIP**
 
 ### GET `/user/<id>/conversations`
 Returns conversations for a given user.
 
-If the user is found:
-**200 OK**
+#### Responses
 
-#### Response
+##### 200 OK
+
+###### Response body
 ```json
 [
   <Message>,
@@ -525,18 +623,10 @@ If the user is found:
 ]
 ```
 
-If the user is not found:
-**400 Bad Request**
+##### 400 Bad Request
+The user id is invalid.
 
-#### Response
-```
-<Error>
-```
-
-If the internal server error occurs:
-**500 Internal Server Error**
-
-#### Response
+#### Response body
 ```
 <Error>
 ```
@@ -544,7 +634,10 @@ If the internal server error occurs:
 ### POST `/message`
 Creates new message.
 
-#### Request
+#### Authorization
+Needs to be authorized as a sender.
+
+#### Request body
 ```json
 {
     "sender_id": <string>,
@@ -557,26 +650,29 @@ Creates new message.
 `conversation_id`: unique ID of the conversation \
 `content`: content of the message
 
-Example request:
+##### Example request body
 ```json
 {
     "sender_id": "KyumBFaY66ZdS3oG7fPZQZycKyC2",
     "receiver_id": "iELOTJC3k6VMCrrtamFq7907REz1",
-    "content": "Dupa 12345"
+    "content": "Test 12345"
 }
 ```
 
-If sending the message is successful: **200 OK**
+#### Responses
 
-#### Response
+##### 201 Created
+When the message was created and sent.
+
+###### Response body
 ```
 <Message>
 ```
 
-#### Example response
+###### Example response body
 ```json
 {
-    "content": "Dupa 12345",
+    "content": "Test 12345",
     "is_sent": true,
     "message_id": 7,
     "receiver": {
@@ -587,7 +683,6 @@ If sending the message is successful: **200 OK**
                 "value": 1.0
             }
         ],
-        "email": "john.doe@example.com",
         "name": "John",
         "uid": "iELOTJC3k6VMCrrtamFq7907REz1"
     },
@@ -599,7 +694,6 @@ If sending the message is successful: **200 OK**
                 "value": 1.0
             }
         ],
-        "email": "karol@kucza.xyz",
         "name": "Karol",
         "uid": "KyumBFaY66ZdS3oG7fPZQZycKyC2"
     },
@@ -607,16 +701,10 @@ If sending the message is successful: **200 OK**
 }
 ```
 
-If at least one of the users is not found:
-**400 Bad Request**
-#### Response
-```
-<Error>
-```
+##### 400 Bad Request
+The sender or receiver id is invalid.
 
-If the internal server error occurs:
-**500 Internal Server Error**
-#### Response
+###### Response body
 ```
 <Error>
 ```
@@ -625,10 +713,14 @@ If the internal server error occurs:
 ### GET `/currencies`
 Returns all currencies.
 
-Standard response:
-**200 OK**
+#### Authorization
+None
 
-#### Response
+#### Responses
+
+##### 200 OK
+
+###### Response body
 ```json
 [
   <Currency>,
@@ -636,7 +728,7 @@ Standard response:
 ]
 ```
 
-#### Example response
+###### Example response body
 ```json
 [
   {
@@ -647,21 +739,19 @@ Standard response:
 ]
 ```
 
-If the internal server error occurs:
-**500 Internal Server Error**
-
-#### Response
-```
-<Error>
-```
-
 ### GET `/health`
 Returns health status of the server.
 
-Response if the server is healthy:
-**200 OK**
+#### Authorization
+None
 
-#### Response (and example response)
+#### Responses
+
+##### 200 OK
+The server is healthy.
+
+
+###### Response body
 ```json
 {
   "healthy": true,
@@ -669,9 +759,10 @@ Response if the server is healthy:
 }
 ```
 
-Response if the server is unhealthy:
-**500 Internal Server Error**
-#### Response
+##### 503 Service Unavailable
+The server is unhealthy.
+
+###### Response body
 ```json
 {
   "healthy": false,
@@ -679,7 +770,7 @@ Response if the server is unhealthy:
 }
 ```
 
-#### Example response
+###### Example response body
 ```json
 {
   "healthy": false,
@@ -688,3 +779,14 @@ Response if the server is unhealthy:
 ```
 
 Or no response at all if the server is down.
+
+## General flows
+
+### User creation
+1. User is created using the appropriate client side Google Firebase Auth method.
+2. A call to the internal API is made by the client to create an entry in the database by
+using the PUT method on the `/user/<id>` endpoint.
+
+### Adding offers
+1. Once the user has started uploading images, the client calls the POST method on the `/image` endpoint.
+2. After all the images are successfully uploaded, the client calls the POST method on the `/offer` endpoint.
