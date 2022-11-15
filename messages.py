@@ -3,7 +3,7 @@ from typing import Optional
 from users import User
 
 # Exceptions import
-from exc import MessageAlreadySentError
+from exc import MessageAlreadySentError, UserNotFoundError
 
 # Functions import
 from datetime import datetime
@@ -32,9 +32,16 @@ class Message:
         :param receiver_id: The id of the receiver.
         :param content: The content of the message.
         :param sent_at: The time the message was sent.
+        :raises UserNotFoundError: If the sender or the receiver does not exist.
         :return: The created message.
         """
-        return cls(None, User.get_user_by_id(sender_id), User.get_user_by_id(receiver_id), content, sent_at)
+        try:
+            sender = User.get_user_by_id(sender_id)
+            receiver = User.get_user_by_id(receiver_id)
+        except UserNotFoundError:
+            raise
+
+        return cls.new_message(sender, receiver, content, sent_at)
 
     @classmethod
     def new_message(cls, sender: User, receiver: User, content: str, sent_at: datetime = datetime.now()) -> "Message":
@@ -50,14 +57,13 @@ class Message:
         """
         return cls(None, sender, receiver, content, sent_at)
 
-    # TODO: Handle errors
     def send(self) -> None:
         """
         Sends the message to the database.
 
-        :raise ValueError: If the message is already sent.
+        :raises MessageAlreadySentError: If the message has already been sent.
+        :raises RuntimeError: If the message has not been created yet.
         """
-        # TODO: Different exception type
         if self.is_sent:
             raise MessageAlreadySentError(self)
 
@@ -80,11 +86,19 @@ class Message:
         Get all messages sent to or from a user.
 
         :param user_id: The id of the user.
+        :raises UserNotFoundError: If the user does not exist.
         :return: A list of messages.
         """
+
+        try:
+            User.get_user_by_id(user_id)
+        except UserNotFoundError:
+            raise
+
         m = []
 
         result = fetch("SELECT * FROM messages WHERE sender_id = %s OR receiver_id = %s", (user_id, user_id))
+
         for raw_message in result:
             sender = User.get_user_by_id(raw_message[1])
             receiver = User.get_user_by_id(raw_message[2])
@@ -96,4 +110,5 @@ class Message:
         return f"Message {self.message_id} from {self.sender.uid} to {self.receiver.uid} at {self.sent_at}"
 
     def __repr__(self) -> str:
-        return f'Message("{self.message_id}", "{self.sender.uid}", "{self.receiver.uid}", "{self.content}", "{self.sent_at}")'
+        return f'Message("{self.message_id}", "{self.sender.uid}", "{self.receiver.uid}", ' \
+               f'"{self.content}", "{self.sent_at}")'
