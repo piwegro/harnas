@@ -95,7 +95,7 @@ At first we declare some primitive types:
   "created_at": <string>,
   "description": <string>,
   "id": <int>,
-  "images": <array[<string>]>,
+  "images": <array[<Image>]>,
   "price": <Price>,
   "seller": <User>,
   "title": <string>,
@@ -106,7 +106,7 @@ At first we declare some primitive types:
 `created_at`: date and time of the offer creation \
 `description`: description of the offer \
 `id`: unique id of the offer \
-`images`: array of image urls \
+`images`: array of the offer images \
 `price`: price of the offer \
 `seller`: user that created the offer \
 `title`: title of the offer \
@@ -120,7 +120,14 @@ At first we declare some primitive types:
   "created_at": "2019-05-18T15:17:00+00:00",
   "description": "Bardzo \u0142adna p\u00f3\u0142eczka we wspania\u0142ym stanie",
   "id": 1,
-  "images": [],
+  "images": [
+    {
+      "image_id": 13,
+      "original": "https://cdn.piwegro.lol/images/13/original.png",
+      "preview": "https://cdn.piwegro.lol/images/13/preview.png",
+      "thumbnail": "https://cdn.piwegro.lol/images/13/thumbnail.png"
+    }
+  ],
   "price": {
     "amount": 4,
     "currency": {
@@ -197,8 +204,29 @@ At first we declare some primitive types:
 ```
 
 ### Image
+```json
+{
+    "image_id": <int>,
+    "original": <string>,
+    "preview": <string>,
+    "thumbnail": <string>
+}
+```
 
-**WIP**
+`image_id`: unique id of the image  
+`original`: URL of the original image  
+`preview`:  URL of the image scaled to 200x113px  
+`thumbnail`: URL of the image scaled to 96x96px  
+
+#### Example object
+```json
+{
+    "image_id": 13,
+    "original": "https://cdn.piwegro.lol/images/13/original.png",
+    "preview": "https://cdn.piwegro.lol/images/13/preview.png",
+    "thumbnail": "https://cdn.piwegro.lol/images/13/thumbnail.png"
+}
+```
 
 ### Error
 ```json
@@ -302,7 +330,14 @@ The offer with a given id was found.
   "created_at": "2019-05-18T15:17:00+00:00",
   "description": "Bardzo \u0142adna p\u00f3\u0142eczka we wspania\u0142ym stanie",
   "id": 1,
-  "images": [],
+  "images": [
+    {
+      "image_id": 13,
+      "original": "https://cdn.piwegro.lol/images/13/original.png",
+      "preview": "https://cdn.piwegro.lol/images/13/preview.png",
+      "thumbnail": "https://cdn.piwegro.lol/images/13/thumbnail.png"
+    }
+  ],
   "price": {
     "amount": 4,
     "currency": {
@@ -455,7 +490,8 @@ Needs to be authorized as any user.
     "price": <int>,
     "title": <string>,
     "description": <string>,
-    "location": <string>
+    "location": <string>,
+    "images": <array[<File>]>
 }
 ```
 
@@ -464,7 +500,8 @@ Needs to be authorized as any user.
 `price`: amount of the currency \
 `title`: title of the offer \
 `description`: description \
-`location`: location of the offer
+`location`: location of the offer \  
+`images`: array of the offer images  
 
 ##### Example request
 ```json
@@ -474,7 +511,15 @@ Needs to be authorized as any user.
     "price": 2,
     "title": "Beautiful offer",
     "description": "Example description of this beautiful offer",
-    "location": "Gdańsk"
+    "location": "Gdańsk",
+    "images": [
+        {
+            "file": {
+                "filename": "image.png",
+                "contents": "..."
+            }
+        }
+    ]
 }
 ```
 
@@ -493,7 +538,14 @@ Needs to be authorized as any user.
     "created_at": "2019-05-18T15:17:00+00:00",
     "description": "Example description of this beautiful offer",
     "id": 3,
-    "images": [],
+    "images": [
+      {
+        "image_id": 13,
+        "original": "https://cdn.piwegro.lol/images/13/original.png",
+        "preview": "https://cdn.piwegro.lol/images/13/preview.png",
+        "thumbnail": "https://cdn.piwegro.lol/images/13/thumbnail.png"
+      }
+    ],
     "price": {
         "amount": 2,
         "currency": {
