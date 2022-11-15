@@ -193,6 +193,10 @@ At first we declare some primitive types:
 }
 ```
 
+### Image
+
+**WIP**
+
 ### Error
 ```json
 {
@@ -526,7 +530,31 @@ Uploads new image.
 #### Authorization
 Needs to be authorized as any user.
 
-**WIP**
+#### Request
+Image file in the body of the request as multipart/form-data.
+
+Accepted file types:
+- image/jpeg
+- image/png
+- image/gif
+
+#### Responses
+
+##### 201 Created
+
+###### Response body
+```
+<Image>
+```
+
+##### 400 Bad Request
+File type is not supported.
+
+###### Response body
+```
+<Error>
+```
+
 
 ### GET `/user/<id>`
 Returns user with given id.
@@ -630,7 +658,58 @@ Updates the user with given id.
 #### Authorization
 Needs to be authorized as the user with given id.
 
-**WIP**
+#### Request body
+```json
+{
+    "name": <string>,
+    "currency": [
+      <string>,
+      <string>,
+      ...
+    ]
+}
+```
+
+`name`: new name of the user (_optional_) \
+`currency`: list of accepted currency symbols (_optional_)
+
+If the field is not present, it will not be updated.
+The `currency` field, if present, must contain at least one currency symbol.
+
+##### Example request body
+```json
+{
+    "name": "Karol",
+    "currency": ["HAR", "TYS"]
+}
+```
+
+#### Responses
+
+##### 200 OK
+The user with a given id was updated.
+
+###### Response body
+```
+<User>
+```
+
+##### 404 Not Found
+The user with a given id does not exist.
+
+###### Response body
+```
+<Error>
+```
+
+##### 400 Bad Request
+At least one of the currencies is invalid.
+
+###### Response body
+```
+<Error>
+```
+
 
 ### GET `/user/<id>/conversations`
 Returns conversations for a given user.
