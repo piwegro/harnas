@@ -4,7 +4,7 @@ from dataclasses import dataclass
 from firebase import FirebaseUser
 
 # Exceptions
-from exc import UserNotFoundError, CurrencyNotFoundError
+from exc import UserNotFoundError, CurrencyNotFoundError, PostgresError
 
 # Functions import
 from db import fetch, execute
@@ -87,12 +87,22 @@ class User:
         :param firebase_user: The FirebaseUser
         :return: The new user
         """
+
+        # TODO: Handle what happens if the user already exists -> should throw a UserAlreadyExistsError exception
         result = execute("INSERT INTO users (id, email, name) VALUES (%s, %s, %s)",
                          (firebase_user.uid, firebase_user.email, firebase_user.name))
 
-        user = User.get_user_by_id(firebase_user.uid)
+        try:
+            user = User.get_user_by_id(firebase_user.uid)
+        except PostgresError:
+            raise
+
         # TODO: Handle default currency better
-        user.add_accepted_currency(Currency("Harnaś", "HAR", 1.0))
+        try:
+            user.add_accepted_currency(Currency("Harnaś", "HAR", 1.0))
+        except PostgresError:
+            raise
+
         return user
 
     def __str__(self):

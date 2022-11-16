@@ -25,6 +25,13 @@ class PostgresError (Exception):
         return self.message
 
 
+class UserAlreadyExistsError (PostgresError):
+    """Raised when a user is added to the database that already exists."""
+
+    def __init__(self):
+        super().__init__("User already exists.")
+
+
 class UserNotFoundError (PostgresError):
     """Raised when a user is not found in the database."""
 
