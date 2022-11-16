@@ -1,11 +1,11 @@
 import firebase_admin
 
 # Exceptions import
-from exc import FirebaseNotInitializedError
+from exc import FirebaseNotInitializedError, FirebaseError, UserNotFoundError
 
 # Functions import
 from os import environ
-from firebase_admin import credentials, auth
+from firebase_admin import credentials, auth, exceptions
 from dataclasses import dataclass
 
 
@@ -36,14 +36,27 @@ class FirebaseUser:
         Get a user by its id
 
         :param uid: users id
+        :raises UserNotFoundError: if the user is not found
+        :raises FirebaseNotInitializedError: if the firebase app is not initialized
+        :raises FirebaseError: if an error occurs while getting the user
         :return: instance of FirebaseUser
         """
         global firebase_app
         if firebase_app is None:
             raise FirebaseNotInitializedError()
 
-        user_record = auth.get_user(uid)
+        # TODO: Handle errors
+        try:
+            user_record = auth.get_user(uid)
+        except auth.UserNotFoundError:
+            raise UserNotFoundError("User with given ID not found")
+        except KeyError:
+            raise UserNotFoundError("User with given ID not found")
+        except exceptions.FirebaseError:
+            raise FirebaseError("An error occurred while retrieving the user")
+
         return cls.from_user_record(user_record)
+
 
     def __str__(self):
         return f"FirebaseUser(uid={self.uid}, email={self.email}, name={self.name})"

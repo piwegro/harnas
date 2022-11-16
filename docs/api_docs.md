@@ -869,7 +869,7 @@ When the message was created and sent.
 ```
 
 ##### 400 Bad Request
-The sender or receiver id is invalid.
+The sender or receiver id is invalid or one of the fields is missing
 
 ###### Response body
 ```
