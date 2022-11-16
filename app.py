@@ -1,11 +1,16 @@
+# Flask import
 from flask import Flask, request
 
-from users import User
+# Exceptions import
+from exc import UserNotFoundError, CurrencyNotFoundError, PostgresError
+
+# Functions and classes import
 from currencies import Currency
 from firebase import FirebaseUser, initialize_firebase
 from health import check_health
 from messages import Message
 from offers import Offer
+from users import User
 
 app = Flask(__name__)
 initialize_firebase()
@@ -40,6 +45,35 @@ def handle_get_offers_by_user_id(user_id: str):
 # Add a single offer
 @app.route("/offer", methods=["POST"])
 def handle_add_offer():
+    data = request.get_json()
+
+    try:
+        seller_id = data["seller_id"]
+        currency_symbol = data["currency"]
+        price = data["price"]
+        title = data["title"]
+        description = data["description"]
+    except KeyError:
+        return "Missing field", 400
+
+    try:
+        offer = Offer.new_offer_with_id(title, description, currency_symbol, price, seller_id, [])
+    except UserNotFoundError:
+        return "User not found", 404
+    except CurrencyNotFoundError:
+        return "Currency not found", 404
+
+    try:
+        offer.add()
+    except PostgresError:
+        return "Database error", 500
+
+    return vars(offer)
+
+
+# Post images
+@app.route("/images", methods=["POST"])
+def handle_post_images():
     return "WIP"
 
 
@@ -108,10 +142,11 @@ def handle_get_all_currencies():
 @app.route("/health", methods=["GET"])
 def handle_health():
     status, message = check_health()
+    status_code = 200 if status else 500
     return {
         "healthy": status,
         "message": message
-    }
+    }, status_code
 
 
 # Handle root queries
