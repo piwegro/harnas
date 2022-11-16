@@ -20,7 +20,7 @@ initialize_firebase()
 
 # GETTING OFFERS
 # Get a single offer by  its id
-@app.route("/offer/<id>", methods=["GET"])
+@app.route("/offer/<offer_id>", methods=["GET"])
 def hande_get_offer_by_id(offer_id: str):
     try:
         offer = Offer.get_offer_by_id(offer_id)
@@ -40,23 +40,25 @@ def handle_get_offers_by_query(query: str, page: str):
 
 # Get all offers (paginated)
 @app.route("/offers/<page>", methods=["GET"])
-def handle_get_all_offers():
+def handle_get_all_offers(page: int):
     try:
         offers = Offer.get_all_offers()
-    except Exception:
+    except Exception as e:
+        print("Exception:", e)
         return Error("Internal server error").to_json(), 500
 
     return offers
 
 
 # Get all offers by a user id (not paginated)
-@app.route("/user/<id>/offers", methods=["GET"])
+@app.route("/user/<user_id>/offers", methods=["GET"])
 def handle_get_offers_by_user_id(user_id: str):
     try:
         offers = Offer.get_offers_by_user_id(user_id)
     except UserNotFoundError:
         return Error("User not found").to_json(), 400
-    except Exception:
+    except Exception as e:
+        print("Exception:", e)
         return Error("Internal server error").to_json(), 500
 
     return offers
@@ -111,12 +113,14 @@ def handle_add_offer():
         return Error("User not found").to_json(), 400
     except CurrencyNotFoundError:
         return Error("Currency not found").to_json(), 400
-    except Exception:
+    except Exception as e:
+        print("Exception:", e)
         return Error("Internal server error").to_json(), 500
 
     try:
         offer.add()
-    except PostgresError:
+    except PostgresError as e:
+        print("PostgresError:", e)
         return Error("Internal server error").to_json(), 500
 
     return vars(offer)
@@ -147,14 +151,16 @@ def handle_add_user_to_db(user_id: str):
         fuser = FirebaseUser.get_user_by_uid(user_id)
     except UserNotFoundError:
         return Error("User not found").to_json(), 400
-    except FirebaseError:
+    except FirebaseError as e:
+        print("FirebaseError:", e)
         return Error("Internal error").to_json(), 500
 
     try:
         user = User.from_firebase_user(fuser)
     except UserAlreadyExistsError:
         return Error("User already exists").to_json(), 409
-    except PostgresError:
+    except PostgresError as e:
+        print("FirebaseError:", e)
         return Error("Internal server error").to_json(), 500
 
     return vars(user), 201
@@ -175,7 +181,8 @@ def handle_get_user_conversations(user_id: str):
         return result, 200
     except UserNotFoundError:
         return Error("User with given ID not found").to_json(), 400
-    except Exception:
+    except Exception as e:
+        print("Exception:", e)
         return Error("Internal server error").to_json(), 500
 
 
@@ -204,7 +211,8 @@ def handle_send_message():
         m.send()
     except UserNotFoundError:
         return Error("At least one of the users not found").to_json(), 400
-    except Exception:
+    except Exception as e:
+        print("Exception:", e)
         return Error("Internal server error").to_json(), 500
 
     return vars(m), 201
@@ -217,7 +225,8 @@ def handle_get_all_currencies():
     try:
         c = Currency.get_currencies()
         return c, 200
-    except Exception:
+    except Exception as e:
+        print("Exception:", e)
         return Error("Internal server error").to_json(), 500
 
 

@@ -73,7 +73,7 @@ class Offer:
                 :return: an offer
                 """
         try:
-            currency = Currency.get_currency_by_symbol(raw_offer[4])
+            currency = Currency.get_currency_by_symbol(raw_offer[5])
             user = User.get_user_by_id(raw_offer[1])
         except UserNotFoundError:
             raise
