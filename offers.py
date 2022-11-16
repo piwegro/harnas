@@ -4,6 +4,7 @@ from dataclasses import dataclass
 from users import User
 from currencies import Currency, Price
 from typing import Optional
+from images import Image
 
 # Exceptions
 from exc import OfferNotFoundError, UserNotFoundError, CurrencyNotFoundError, PostgresError
@@ -19,13 +20,13 @@ class Offer:
     description: str
     price: Price
     seller: User
-    images: list[str]
+    images: Image
     created_at: datetime
 
     is_added = property(lambda self: self.id is not None)
 
     @classmethod
-    def new_offer(cls, title: str, description: str, price: Price, seller: User, images: list[str]) -> "Offer":
+    def new_offer(cls, title: str, description: str, price: Price, seller: User, images: Image) -> "Offer":
         """
         Creates a new offer.
 
@@ -40,7 +41,7 @@ class Offer:
 
     @classmethod
     def new_offer_with_id(cls, title: str, description: str, currency_symbol: str, amount: int,
-                          seller_id: str, images: list[str]) -> "Offer":
+                          seller_id: str, images: Image) -> "Offer":
         """
         Creates a new offer, but with seller id instead of seller object.
 
@@ -81,7 +82,7 @@ class Offer:
             raise
 
         return cls(raw_offer[0], raw_offer[2], raw_offer[3],
-                   Price(raw_offer[4], currency), user, raw_offer[6], raw_offer[7])
+                   Price(raw_offer[4], currency), user, Image.dummy(), raw_offer[7])
 
     def add(self) -> None:
         """
