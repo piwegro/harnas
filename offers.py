@@ -17,7 +17,7 @@ RESULTS_PER_PAGE = 15
 
 @dataclass(init=True, eq=True, order=True, unsafe_hash=False, frozen=False)
 class Offer:
-    id: Optional[str]
+    offer_id: Optional[int]
     title: str
     description: str
     price: Price
@@ -25,7 +25,7 @@ class Offer:
     images: List[Image]
     created_at: datetime
 
-    is_added = property(lambda self: self.id is not None)
+    is_added = property(lambda self: self.offer_id is not None)
 
     @classmethod
     def new_offer(cls, title: str, description: str, price: Price, seller: User, images: List[Image]) -> "Offer":
@@ -106,7 +106,7 @@ class Offer:
         if result is None or len(result) == 0:
             raise PostgresError("The offer was not added to the database.")
 
-        self.id = result[0][0]
+        self.offer_id = result[0][0]
 
     @classmethod
     def get_all_offers(cls) -> list["Offer"]:
@@ -193,10 +193,10 @@ class Offer:
         return list_of_offers
 
     def __str__(self):
-        return f'Offer(id="{self.id}", title="{self.title}", description="{self.description}", ' \
+        return f'Offer(id="{self.offer_id}", title="{self.title}", description="{self.description}", ' \
                f'price="{self.price.amount}", currency="{self.price.currency.symbol}", seller\' id="{self.seller.uid}", ' \
                f'images="{self.images}", created_at="{self.created_at.min}")'
 
     def __repr__(self):
-        return f'Offer("{self.id}", "{self.title}", "{self.description}", "{self.price.amount}", ' \
+        return f'Offer("{self.offer_id}", "{self.title}", "{self.description}", "{self.price.amount}", ' \
                f'"{self.price.currency}", "{self.seller.uid}", "{self.images}", "{self.created_at.min}")'
