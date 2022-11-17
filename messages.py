@@ -13,14 +13,14 @@ from db import execute, fetch
 
 @dataclass(init=True, eq=True, order=True, unsafe_hash=False, frozen=False)
 class Message:
-    message_id: Optional[str]
+    message_id: Optional[int]
 
     sender: User
     receiver: User
     content: str
     sent_at: datetime
 
-    is_sent: bool = False
+    is_sent: bool = property(lambda self: self.message_id is not None)
 
     @classmethod
     def new_message_with_ids(cls, sender_id: str, receiver_id: str, content: str,
@@ -77,8 +77,7 @@ class Message:
         if result is None or len(result) == 0:
             raise RuntimeError("Count not send the message")
 
-        self.message_id = result[0][0]
-        self.is_sent = True
+        self.message_id = int(result[0][0])
 
     @classmethod
     def get_messages_by_user_id(cls, user_id: str) -> list["Message"]:
