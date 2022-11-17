@@ -12,6 +12,8 @@ from exc import OfferNotFoundError, UserNotFoundError, CurrencyNotFoundError, Po
 # Functions import
 from db import fetch, execute
 
+RESULTS_PER_PAGE = 15
+
 
 @dataclass(init=True, eq=True, order=True, unsafe_hash=False, frozen=False)
 class Offer:
@@ -115,6 +117,27 @@ class Offer:
         :raises: PostgresError if there is no offers in the database
         """
         result = fetch("SELECT * FROM offers", ())
+
+        list_of_offers = []
+
+        for offer in result:
+            list_of_offers.append(cls.new_offer_from_row(offer))
+
+        return list_of_offers
+
+    @classmethod
+    def search_offers(cls, query: str, page: int) -> list["Offer"]:
+        """
+        Search offers by query
+
+        :param query: the query to search
+        :return: list of offers
+        """
+        max_len = len(query)/2
+        page_start = page * RESULTS_PER_PAGE
+        result = fetch("SELECT * FROM piwegro.offers WHERE LEVENSHTEIN(LOWER(name), LOWER(%s)) < %s "
+                       "ORDER BY LEVENSHTEIN(LOWER(name), LOWER(%s)) ASC LIMIT %s OFFSET %s ;",
+                       (query, max_len, query, RESULTS_PER_PAGE, page_start))
 
         list_of_offers = []
 
