@@ -28,8 +28,11 @@ class PostgresError (Exception):
 class UserAlreadyExistsError (PostgresError):
     """Raised when a user is added to the database that already exists."""
 
-    def __init__(self):
-        super().__init__("User already exists.")
+    def __init__(self, uid):
+        self.uid = uid
+
+    def __str__(self):
+        return f"User with uid {self.uid} not found."
 
 
 class UserNotFoundError (PostgresError):
