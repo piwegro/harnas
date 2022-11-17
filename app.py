@@ -7,12 +7,13 @@ from exc import UserNotFoundError, CurrencyNotFoundError, PostgresError, Firebas
 
 # Functions and classes import
 from currencies import Currency
+from error import Error
 from firebase import FirebaseUser, initialize_firebase
 from health import check_health
 from messages import Message
 from offers import Offer
 from users import User
-from error import Error
+
 
 app = Flask(__name__)
 initialize_firebase()
@@ -25,9 +26,10 @@ def hande_get_offer_by_id(offer_id: str):
     try:
         offer = Offer.get_offer_by_id(offer_id)
     except OfferNotFoundError:
-        return Error("Offer not found").to_json(), 400
-    except Exception:
-        return Error("Internal server error").to_json(), 500
+        return Error("Offer not found").to_json(400)
+    except Exception as e:
+        print("Exception:", e)
+        return Error("Internal server error").to_json(500)
 
     return vars(offer)
 
@@ -45,7 +47,7 @@ def handle_get_all_offers(page: int):
         offers = Offer.get_all_offers()
     except Exception as e:
         print("Exception:", e)
-        return Error("Internal server error").to_json(), 500
+        return Error("Internal server error").to_json(500)
 
     return offers
 
@@ -56,10 +58,10 @@ def handle_get_offers_by_user_id(user_id: str):
     try:
         offers = Offer.get_offers_by_user_id(user_id)
     except UserNotFoundError:
-        return Error("User not found").to_json(), 400
+        return Error("User not found").to_json(400)
     except Exception as e:
         print("Exception:", e)
-        return Error("Internal server error").to_json(), 500
+        return Error("Internal server error").to_json(500)
 
     return offers
 
@@ -75,53 +77,53 @@ def handle_add_offer():
     try:
         title = data["title"]
     except KeyError:
-        return Error("Missing field: 'title'").to_json(), 400
+        return Error("Missing field: 'title'").to_json(400)
 
     try:
         description = data["description"]
     except KeyError:
-        return Error("Missing field: 'description'").to_json(), 400
+        return Error("Missing field: 'description'").to_json(400)
 
     try:
         currency_symbol = data["currency"]
     except KeyError:
-        return Error("Missing field: 'currency'").to_json(), 400
+        return Error("Missing field: 'currency'").to_json(400)
 
     try:
         price = data["price"]
     except KeyError:
-        return Error("Missing field: 'price'").to_json(), 400
+        return Error("Missing field: 'price'").to_json(400)
 
     try:
         location = data["location"]
     except KeyError:
-        return Error("Missing field: 'location'").to_json(), 400
+        return Error("Missing field: 'location'").to_json(400)
 
     try:
         images = data["images"]
     except KeyError:
-        return Error("Missing field: 'images'").to_json(), 400
+        return Error("Missing field: 'images'").to_json(400)
 
     try:
         seller_id = data["seller_id"]
     except KeyError:
-        return Error("Missing field: 'seller_id'").to_json(), 400
+        return Error("Missing field: 'seller_id'").to_json(400)
 
     try:
         offer = Offer.new_offer_with_id(title, description, currency_symbol, price, seller_id, [])
     except UserNotFoundError:
-        return Error("User not found").to_json(), 400
+        return Error("User not found").to_json(400)
     except CurrencyNotFoundError:
-        return Error("Currency not found").to_json(), 400
+        return Error("Currency not found").to_json(400)
     except Exception as e:
         print("Exception:", e)
-        return Error("Internal server error").to_json(), 500
+        return Error("Internal server error").to_json(500)
 
     try:
         offer.add()
     except PostgresError as e:
         print("PostgresError:", e)
-        return Error("Internal server error").to_json(), 500
+        return Error("Internal server error").to_json(500)
 
     return vars(offer)
 
@@ -139,7 +141,7 @@ def handle_user_by_id(user_id: str):
     try:
         user = User.get_user_by_id(user_id)
     except UserNotFoundError:
-        return Error("User not found").to_json(), 404
+        return Error("User not found").to_json(404)
 
     return vars(user), 200
 
@@ -150,18 +152,18 @@ def handle_add_user_to_db(user_id: str):
     try:
         fuser = FirebaseUser.get_user_by_uid(user_id)
     except UserNotFoundError:
-        return Error("User not found").to_json(), 400
+        return Error("User not found").to_json(400)
     except FirebaseError as e:
         print("FirebaseError:", e)
-        return Error("Internal error").to_json(), 500
+        return Error("Internal error").to_json(500)
 
     try:
         user = User.from_firebase_user(fuser)
     except UserAlreadyExistsError:
-        return Error("User already exists").to_json(), 409
+        return Error("User already exists").to_json(409)
     except PostgresError as e:
         print("FirebaseError:", e)
-        return Error("Internal server error").to_json(), 500
+        return Error("Internal server error").to_json(500)
 
     return vars(user), 201
 
@@ -180,10 +182,10 @@ def handle_get_user_conversations(user_id: str):
         result = Message.get_messages_by_user_id(user_id)
         return result, 200
     except UserNotFoundError:
-        return Error("User with given ID not found").to_json(), 400
+        return Error("User with given ID not found").to_json(400)
     except Exception as e:
         print("Exception:", e)
-        return Error("Internal server error").to_json(), 500
+        return Error("Internal server error").to_json(500)
 
 
 # Send a single new message to another user
@@ -194,26 +196,26 @@ def handle_send_message():
     try:
         sender_id = data["sender_id"]
     except KeyError:
-        return Error("Missing field: sender_id").to_json(), 400
+        return Error("Missing field: sender_id").to_json(400)
 
     try:
         receiver_id = data["receiver_id"]
     except KeyError:
-        return Error("Missing field: receiver_id").to_json(), 400
+        return Error("Missing field: receiver_id").to_json(400)
 
     try:
         content = data["content"]
     except KeyError:
-        return Error("Missing field: content").to_json(), 400
+        return Error("Missing field: content").to_json(400)
 
     try:
         m = Message.new_message_with_ids(sender_id, receiver_id, content)
         m.send()
     except UserNotFoundError:
-        return Error("At least one of the users not found").to_json(), 400
+        return Error("At least one of the users not found").to_json(400)
     except Exception as e:
         print("Exception:", e)
-        return Error("Internal server error").to_json(), 500
+        return Error("Internal server error").to_json(500)
 
     return vars(m), 201
 
@@ -227,7 +229,7 @@ def handle_get_all_currencies():
         return c, 200
     except Exception as e:
         print("Exception:", e)
-        return Error("Internal server error").to_json(), 500
+        return Error("Internal server error").to_json(500)
 
 
 # MISCELLANEOUS
