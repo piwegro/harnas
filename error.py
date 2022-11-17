@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from flask import make_response, jsonify, Response
 
 
 @dataclass
@@ -12,6 +13,13 @@ class Error:
     def __str__(self):
         return self.message
 
-    def to_json(self):
-        escaped_message = self.message.replace('"', '\\"')
-        return f'{{"error": "{escaped_message}"}}'
+    def to_json(self, status_code: int) -> Response:
+        response_object = {
+            'error': self.message
+        }
+
+        json_response = jsonify(response_object)
+        response = make_response(json_response, status_code)
+        response.headers['Content-Type'] = 'application/json'
+
+        return response
