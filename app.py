@@ -13,6 +13,7 @@ from messages import Message
 from offers import Offer
 from users import User
 from error import Error
+from images import Image
 
 app = Flask(__name__)
 initialize_firebase()
@@ -108,7 +109,9 @@ def handle_add_offer():
         return Error("Missing field: 'seller_id'").to_json(), 400
 
     try:
-        offer = Offer.new_offer_with_id(title, description, currency_symbol, price, seller_id, [])
+        # TODO: Remove after implementing handling images
+        images = Image.dummies()
+        offer = Offer.new_offer_with_id(title, description, currency_symbol, price, seller_id, images)
     except UserNotFoundError:
         return Error("User not found").to_json(), 400
     except CurrencyNotFoundError:
