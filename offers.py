@@ -3,13 +3,16 @@ from datetime import datetime
 from dataclasses import dataclass
 from users import User
 from currencies import Currency, Price
-from typing import Optional
+from typing import Optional, List
+from images import Image
 
 # Exceptions
 from exc import OfferNotFoundError, UserNotFoundError, CurrencyNotFoundError, PostgresError
 
 # Functions import
 from db import fetch, execute
+
+RESULTS_PER_PAGE = 15
 
 
 @dataclass(init=True, eq=True, order=True, unsafe_hash=False, frozen=False)
@@ -19,13 +22,13 @@ class Offer:
     description: str
     price: Price
     seller: User
-    images: list[str]
+    images: List[Image]
     created_at: datetime
 
     is_added = property(lambda self: self.id is not None)
 
     @classmethod
-    def new_offer(cls, title: str, description: str, price: Price, seller: User, images: list[str]) -> "Offer":
+    def new_offer(cls, title: str, description: str, price: Price, seller: User, images: List[Image]) -> "Offer":
         """
         Creates a new offer.
 
@@ -40,7 +43,7 @@ class Offer:
 
     @classmethod
     def new_offer_with_id(cls, title: str, description: str, currency_symbol: str, amount: int,
-                          seller_id: str, images: list[str]) -> "Offer":
+                          seller_id: str, images: List[Image]) -> "Offer":
         """
         Creates a new offer, but with seller id instead of seller object.
 
@@ -81,7 +84,7 @@ class Offer:
             raise
 
         return cls(raw_offer[0], raw_offer[2], raw_offer[3],
-                   Price(raw_offer[4], currency), user, raw_offer[6], raw_offer[7])
+                   Price(raw_offer[4], currency), user, Image.dummies(), raw_offer[7])
 
     def add(self) -> None:
         """
@@ -89,16 +92,16 @@ class Offer:
 
         :raises PostgresError: If the offer could not be added to the database.
         """
-        execute("INSERT INTO offers (seller_id, name, description, price, currency, images, created_at) "
+        execute("INSERT INTO offers (seller_id, name, description, price, currency, created_at) "
                 "VALUES (%s, %s, %s, %s, %s, %s, %s)",
                 (self.seller.uid, self.title, self.description, self.price.amount, self.price.currency.symbol,
-                 self.images, self.created_at))
+                 self.created_at))
 
         result = fetch("SELECT id FROM offers WHERE seller_id = %s AND name = %s AND description = %s "
-                       "AND price = %s AND currency = %s AND images = %s AND created_at = %s "
+                       "AND price = %s AND currency = %s AND created_at = %s "
                        "ORDER BY created_at DESC LIMIT 1",
                        (self.seller.uid, self.title, self.description, self.price.amount,
-                        self.price.currency.symbol, self.images, self.created_at))
+                        self.price.currency.symbol, self.created_at))
 
         if result is None or len(result) == 0:
             raise PostgresError("The offer was not added to the database.")
@@ -114,6 +117,27 @@ class Offer:
         :raises: PostgresError if there is no offers in the database
         """
         result = fetch("SELECT * FROM offers", ())
+
+        list_of_offers = []
+
+        for offer in result:
+            list_of_offers.append(cls.new_offer_from_row(offer))
+
+        return list_of_offers
+
+    @classmethod
+    def search_offers(cls, query: str, page: int) -> list["Offer"]:
+        """
+        Search offers by query
+
+        :param query: the query to search
+        :return: list of offers
+        """
+        max_len = len(query)/2
+        page_start = page * RESULTS_PER_PAGE
+        result = fetch("SELECT * FROM piwegro.offers WHERE LEVENSHTEIN(LOWER(name), LOWER(%s)) < %s "
+                       "ORDER BY LEVENSHTEIN(LOWER(name), LOWER(%s)) ASC LIMIT %s OFFSET %s ;",
+                       (query, max_len, query, RESULTS_PER_PAGE, page_start))
 
         list_of_offers = []
 

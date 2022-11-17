@@ -13,6 +13,7 @@ from messages import Message
 from offers import Offer
 from users import User
 from error import Error
+from images import Image
 
 app = Flask(__name__)
 initialize_firebase()
@@ -35,7 +36,13 @@ def hande_get_offer_by_id(offer_id: str):
 # Get all offers for a query (paginated)
 @app.route("/offers/search/<query>/<page>", methods=["GET"])
 def handle_get_offers_by_query(query: str, page: str):
-    return "", 204
+    try:
+        offers = Offer.search_offers(query, int(page))
+    except Exception as e:
+        print("Exception:", e)
+        return Error("Internal server error").to_json(), 500
+
+    return offers, 200
 
 
 # Get all offers (paginated)
@@ -47,7 +54,7 @@ def handle_get_all_offers(page: int):
         print("Exception:", e)
         return Error("Internal server error").to_json(), 500
 
-    return offers
+    return offers, 200
 
 
 # Get all offers by a user id (not paginated)
@@ -61,7 +68,7 @@ def handle_get_offers_by_user_id(user_id: str):
         print("Exception:", e)
         return Error("Internal server error").to_json(), 500
 
-    return offers
+    return offers, 200
 
 
 # ADDING OFFERS
@@ -108,7 +115,9 @@ def handle_add_offer():
         return Error("Missing field: 'seller_id'").to_json(), 400
 
     try:
-        offer = Offer.new_offer_with_id(title, description, currency_symbol, price, seller_id, [])
+        # TODO: Remove after implementing handling images
+        images = Image.dummies()
+        offer = Offer.new_offer_with_id(title, description, currency_symbol, price, seller_id, images)
     except UserNotFoundError:
         return Error("User not found").to_json(), 400
     except CurrencyNotFoundError:
