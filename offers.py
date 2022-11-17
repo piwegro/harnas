@@ -3,7 +3,7 @@ from datetime import datetime
 from dataclasses import dataclass
 from users import User
 from currencies import Currency, Price
-from typing import Optional
+from typing import Optional, List
 from images import Image
 
 # Exceptions
@@ -20,13 +20,13 @@ class Offer:
     description: str
     price: Price
     seller: User
-    images: Image
+    images: List[Image]
     created_at: datetime
 
     is_added = property(lambda self: self.id is not None)
 
     @classmethod
-    def new_offer(cls, title: str, description: str, price: Price, seller: User, images: Image) -> "Offer":
+    def new_offer(cls, title: str, description: str, price: Price, seller: User, images: List[Image]) -> "Offer":
         """
         Creates a new offer.
 
@@ -41,7 +41,7 @@ class Offer:
 
     @classmethod
     def new_offer_with_id(cls, title: str, description: str, currency_symbol: str, amount: int,
-                          seller_id: str, images: Image) -> "Offer":
+                          seller_id: str, images: List[Image]) -> "Offer":
         """
         Creates a new offer, but with seller id instead of seller object.
 
@@ -82,7 +82,7 @@ class Offer:
             raise
 
         return cls(raw_offer[0], raw_offer[2], raw_offer[3],
-                   Price(raw_offer[4], currency), user, Image.dummy(), raw_offer[7])
+                   Price(raw_offer[4], currency), user, Image.dummies(), raw_offer[7])
 
     def add(self) -> None:
         """
@@ -90,16 +90,16 @@ class Offer:
 
         :raises PostgresError: If the offer could not be added to the database.
         """
-        execute("INSERT INTO offers (seller_id, name, description, price, currency, images, created_at) "
+        execute("INSERT INTO offers (seller_id, name, description, price, currency, created_at) "
                 "VALUES (%s, %s, %s, %s, %s, %s, %s)",
                 (self.seller.uid, self.title, self.description, self.price.amount, self.price.currency.symbol,
-                 self.images, self.created_at))
+                 self.created_at))
 
         result = fetch("SELECT id FROM offers WHERE seller_id = %s AND name = %s AND description = %s "
-                       "AND price = %s AND currency = %s AND images = %s AND created_at = %s "
+                       "AND price = %s AND currency = %s AND created_at = %s "
                        "ORDER BY created_at DESC LIMIT 1",
                        (self.seller.uid, self.title, self.description, self.price.amount,
-                        self.price.currency.symbol, self.images, self.created_at))
+                        self.price.currency.symbol, self.created_at))
 
         if result is None or len(result) == 0:
             raise PostgresError("The offer was not added to the database.")
