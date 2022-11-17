@@ -35,7 +35,13 @@ def hande_get_offer_by_id(offer_id: str):
 # Get all offers for a query (paginated)
 @app.route("/offers/search/<query>/<page>", methods=["GET"])
 def handle_get_offers_by_query(query: str, page: str):
-    return "", 204
+    try:
+        offers = Offer.search_offers(query, int(page))
+    except Exception as e:
+        print("Exception:", e)
+        return Error("Internal server error").to_json(), 500
+
+    return offers, 200
 
 
 # Get all offers (paginated)
@@ -47,7 +53,7 @@ def handle_get_all_offers(page: int):
         print("Exception:", e)
         return Error("Internal server error").to_json(), 500
 
-    return offers
+    return offers, 200
 
 
 # Get all offers by a user id (not paginated)
@@ -61,7 +67,7 @@ def handle_get_offers_by_user_id(user_id: str):
         print("Exception:", e)
         return Error("Internal server error").to_json(), 500
 
-    return offers
+    return offers, 200
 
 
 # ADDING OFFERS
