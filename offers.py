@@ -23,12 +23,14 @@ class Offer:
     price: Price
     seller: User
     images: List[Image]
+    location: str
     created_at: datetime
 
     is_added = property(lambda self: self.id is not None)
 
     @classmethod
-    def new_offer(cls, title: str, description: str, price: Price, seller: User, images: List[Image]) -> "Offer":
+    def new_offer(cls, title: str, description: str, price: Price,
+                  seller: User, location: str, images: List[Image]) -> "Offer":
         """
         Creates a new offer.
 
@@ -36,14 +38,16 @@ class Offer:
         :param description: The description of the offer.
         :param price: The price of the offer.
         :param seller: The seller.
+        :param location: The location of the offer.
         :param images: The list of links to the images.
+
         :return: The new offer.
         """
-        return cls(None, title, description, price, seller, images, datetime.now())
+        return cls(None, title, description, price, seller, location, images, datetime.now())
 
     @classmethod
     def new_offer_with_id(cls, title: str, description: str, currency_symbol: str, amount: int,
-                          seller_id: str, images: List[Image]) -> "Offer":
+                          seller_id: str, location: str, images: List[Image]) -> "Offer":
         """
         Creates a new offer, but with seller id instead of seller object.
 
@@ -52,9 +56,12 @@ class Offer:
         :param currency_symbol: The symbol of the currency.
         :param amount: The amount of the currency.
         :param seller_id: The id of the seller.
+        :param location: The location of the offer.
         :param images: The list of links to the images.
+
         :raises UserNotFoundError: If the user with the given id does not exist.
         :raises CurrencyNotFoundError: If the currency with the given symbol does not exist.
+
         :return: The new offer.
         """
         try:
@@ -65,7 +72,7 @@ class Offer:
         except CurrencyNotFoundError:
             raise
 
-        return cls(None, title, description, Price(amount, currency), seller, images, datetime.now())
+        return cls(None, title, description, Price(amount, currency), seller, images, location, datetime.now())
 
     @classmethod
     def new_offer_from_row(cls, raw_offer) -> "Offer":
@@ -84,7 +91,7 @@ class Offer:
             raise
 
         return cls(raw_offer[0], raw_offer[2], raw_offer[3],
-                   Price(raw_offer[4], currency), user, Image.dummies(), raw_offer[7])
+                   Price(raw_offer[4], currency), user, Image.dummies(), raw_offer[8], raw_offer[7])
 
     def add(self) -> None:
         """
@@ -92,16 +99,16 @@ class Offer:
 
         :raises PostgresError: If the offer could not be added to the database.
         """
-        execute("INSERT INTO offers (seller_id, name, description, price, currency, created_at) "
+        execute("INSERT INTO offers (seller_id, name, description, price, currency, created_at, location) "
                 "VALUES (%s, %s, %s, %s, %s, %s, %s)",
                 (self.seller.uid, self.title, self.description, self.price.amount, self.price.currency.symbol,
-                 self.created_at))
+                 self.created_at, self.location))
 
         result = fetch("SELECT id FROM offers WHERE seller_id = %s AND name = %s AND description = %s "
-                       "AND price = %s AND currency = %s AND created_at = %s "
+                       "AND price = %s AND currency = %s AND created_at = %s AND location = %s",
                        "ORDER BY created_at DESC LIMIT 1",
                        (self.seller.uid, self.title, self.description, self.price.amount,
-                        self.price.currency.symbol, self.created_at))
+                        self.price.currency.symbol, self.created_at, self.location))
 
         if result is None or len(result) == 0:
             raise PostgresError("The offer was not added to the database.")
@@ -130,6 +137,7 @@ class Offer:
         """
         Search offers by query
 
+        :param page: The page number.
         :param query: the query to search
         :return: list of offers
         """
