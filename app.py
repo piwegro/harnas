@@ -41,7 +41,7 @@ def handle_get_offers_by_query(query: str, page: str):
         offers = Offer.search_offers(query, int(page))
     except Exception as e:
         print("Exception:", e)
-        return Error("Internal server error").to_json(), 500
+        return Error("Internal server error").to_json(500)
 
     return offers, 200
 
