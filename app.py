@@ -139,7 +139,11 @@ def handle_add_offer():
 # Post images
 @app.route("/images", methods=["POST"])
 def handle_post_images():
-    return "", 204
+    try:
+        return Image.dummies(), 201
+    except Exception as e:
+        print("Exception:", e)
+        return Error("Internal server error").to_json(500)
 
 
 # USER MANAGEMENT
