@@ -1,12 +1,17 @@
+from typing import Optional, List, Tuple
+
 import psycopg2
 from os import environ
+
+from exc import PostgresError
+
 
 DATABASE_HOST = environ["POSTGRES_HOST"]
 DATABASE_USER = environ["POSTGRES_USER"]
 DATABASE_PASSWORD = environ["POSTGRES_PASSWORD"]
 DATABASE_NAME = environ["POSTGRES_DB_MAIN"]
 
-connection = None
+connection: Optional[psycopg2._psycopg.connection] = None
 
 
 def connect() -> None:
@@ -14,46 +19,78 @@ def connect() -> None:
     if connection is not None:
         return
 
-    connection = psycopg2.connect(
-        host=DATABASE_HOST,
-        user=DATABASE_USER,
-        password=DATABASE_PASSWORD,
-        dbname=DATABASE_NAME,
-        options="-c search_path=piwegro"
-    )
+    try:
+        connection = psycopg2.connect(
+            host=DATABASE_HOST,
+            user=DATABASE_USER,
+            password=DATABASE_PASSWORD,
+            dbname=DATABASE_NAME,
+            options="-c search_path=piwegro"
+        )
+    except Exception as e:
+        raise PostgresError(f"Error while connecting to Postgres: {e}")
 
 
-def fetch(query: str, params: tuple):
+def disconnect() -> None:
+    """
+    Disconnects from the database.
+
+    :return: None
+    """
+    global connection
+    if connection is None:
+        return
+
+    connection.close()
+    connection = None
+
+
+def fetch(query: str, params: tuple) -> List[Tuple]:
     """
     Fetches a single row from the database.
 
-    :param query:
-    :param params:
-    :return:
+    :param query: SQL query to execute
+    :param params: parameters to pass to the query
+
+    :return: a list of tuples
     """
-    global connection
-    if connection is None:
-        connect()
 
-    with connection.cursor() as cursor:
-        cursor.execute(query, params)
-        connection.commit()
+    try:
+        global connection
+        if connection is None:
+            connect()
+    except PostgresError:
+        raise
 
-        return cursor.fetchall()
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute(query, params)
+            connection.commit()
+
+            return cursor.fetchall()
+    except Exception as e:
+        raise PostgresError(f"Error while fetching from Postgres: {e}")
 
 
-def execute(query: str, params: tuple):
+def execute(query: str, params: tuple) -> None:
     """
-    Executes a query on the database.
+    Executes a query on the database. Does not return anything.
 
-    :param query:
-    :param params:
-    :return:
+    :param query: SQL query to execute
+    :param params: parameters to pass to the query
+
+    :return: None
     """
-    global connection
-    if connection is None:
-        connect()
+    try:
+        global connection
+        if connection is None:
+            connect()
+    except PostgresError:
+        raise
 
-    with connection.cursor() as cursor:
-        cursor.execute(query, params)
-        connection.commit()
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute(query, params)
+            connection.commit()
+    except Exception as e:
+        raise PostgresError(f"Error while executing with Postgres: {e}")
