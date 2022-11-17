@@ -30,7 +30,7 @@ class Offer:
 
     @classmethod
     def new_offer(cls, title: str, description: str, price: Price,
-                  seller: User, location: str, images: List[Image]) -> "Offer":
+                  seller: User, images: List[Image], location: str) -> "Offer":
         """
         Creates a new offer.
 
@@ -43,11 +43,11 @@ class Offer:
 
         :return: The new offer.
         """
-        return cls(None, title, description, price, seller, location, images, datetime.now())
+        return cls(None, title, description, price, seller, images, location, datetime.now())
 
     @classmethod
     def new_offer_with_id(cls, title: str, description: str, currency_symbol: str, amount: int,
-                          seller_id: str, location: str, images: List[Image]) -> "Offer":
+                          seller_id: str, images: List[Image], location: str) -> "Offer":
         """
         Creates a new offer, but with seller id instead of seller object.
 
