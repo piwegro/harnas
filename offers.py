@@ -99,8 +99,8 @@ class Offer:
 
         :raises PostgresError: If the offer could not be added to the database.
         """
-        execute("INSERT INTO offers (seller_id, name, description, price, currency, created_at, location) "
-                "VALUES (%s, %s, %s, %s, %s, %s, %s)",
+        execute("INSERT INTO offers (seller_id, name, description, price, currency, created_at, location, images) "
+                "VALUES (%s, %s, %s, %s, %s, %s, '{}')",
                 (self.seller.uid, self.title, self.description, self.price.amount, self.price.currency.symbol,
                  self.created_at, self.location))
 
@@ -201,9 +201,9 @@ class Offer:
         return list_of_offers
 
     def __str__(self):
-        return f'Offer(id="{self.id}", title="{self.title}", description="{self.description}", ' \
-               f'price="{self.price.amount}", currency="{self.price.currency.symbol}", seller\' id="{self.seller.uid}", ' \
-               f'images="{self.images}", created_at="{self.created_at.min}")'
+        return f'Offer\nTitle: "{self.title}" (ID: {self.id})\nDescription: "{self.description}"\n' \
+               f'Price: {self.price.amount} {self.price.currency.symbol} Seller: {self.seller.name}\n' \
+               f'Created: {self.created_at}, Location: {self.location})\n'
 
     def __repr__(self):
         return f'Offer("{self.id}", "{self.title}", "{self.description}", "{self.price.amount}", ' \
