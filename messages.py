@@ -20,7 +20,7 @@ class Message:
     content: str
     sent_at: datetime
 
-    is_sent: bool = property(lambda self: self.message_id is not None)
+    is_sent = property(lambda self: self.message_id is not None)
 
     @classmethod
     def new_message_with_ids(cls, sender_id: str, receiver_id: str, content: str,
@@ -101,7 +101,7 @@ class Message:
         for raw_message in result:
             sender = User.get_user_by_id(raw_message[1])
             receiver = User.get_user_by_id(raw_message[2])
-            m.append(cls(raw_message[0], sender, receiver, raw_message[3], raw_message[4], True))
+            m.append(cls(raw_message[0], sender, receiver, raw_message[3], raw_message[4]))
 
         return m
 
