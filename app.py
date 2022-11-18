@@ -1,5 +1,6 @@
 # Flask import
 from flask import Flask, request
+from flask_cors import CORS
 
 # Exceptions import
 from exc import UserNotFoundError, CurrencyNotFoundError, PostgresError, FirebaseError, UserAlreadyExistsError, \
@@ -16,6 +17,8 @@ from offers import Offer
 from users import User
 
 app = Flask(__name__)
+CORS(app)
+
 initialize_firebase()
 
 
@@ -36,9 +39,9 @@ def hande_get_offer_by_id(offer_id: str):
 
 # Get all offers for a query (paginated)
 @app.route("/offers/search/<query>/<page>", methods=["GET"])
-def handle_get_offers_by_query(query: str, page: str):
+def handle_get_offers_by_query(query: str, page: int):
     try:
-        offers = Offer.search_offers(query, int(page))
+        offers = Offer.search_offers(query, page)
     except Exception as e:
         print("Exception:", e)
         return Error("Internal server error").to_json(500)
@@ -116,9 +119,14 @@ def handle_add_offer():
         return Error("Missing field: 'seller_id'").to_json(400)
 
     try:
+        price = int(price)
+    except ValueError:
+        return Error("Invalid price").to_json(400)
+
+    try:
         # TODO: Remove after implementing handling images
         images = Image.dummies()
-        offer = Offer.new_offer_with_id(title, description, currency_symbol, price, seller_id, images)
+        offer = Offer.new_offer_with_id(title, description, currency_symbol, price, seller_id, images, location)
     except UserNotFoundError:
         return Error("User not found").to_json(400)
     except CurrencyNotFoundError:

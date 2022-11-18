@@ -4,7 +4,7 @@ from dataclasses import dataclass
 from firebase import FirebaseUser
 
 # Exceptions
-from exc import UserNotFoundError, CurrencyNotFoundError, PostgresError
+from exc import UserNotFoundError, CurrencyNotFoundError, PostgresError, UserAlreadyExistsError
 
 # Functions import
 from db import fetch, execute
@@ -62,8 +62,8 @@ class User:
         if result is None or len(result) == 0 or result[0][0] == 0:
             raise CurrencyNotFoundError(currency.symbol)
 
-        result = execute("INSERT INTO accepted_currencies (user_id, currency_symbol) VALUES (%s, %s)",
-                         (self.uid, currency.symbol))
+        execute("INSERT INTO accepted_currencies (user_id, currency_symbol) VALUES (%s, %s)",
+                (self.uid, currency.symbol))
 
         self.accepted_currencies.append(currency)
 
@@ -85,12 +85,22 @@ class User:
         to the postgres database
 
         :param firebase_user: The FirebaseUser
+
+        :raises UserAlreadyExistsError: If the user already exists
+        :raises PostgresError: If the database error occurs
+
         :return: The new user
         """
 
-        # TODO: Handle what happens if the user already exists -> should throw a UserAlreadyExistsError exception
-        result = execute("INSERT INTO users (id, email, name) VALUES (%s, %s, %s)",
-                         (firebase_user.uid, firebase_user.email, firebase_user.name))
+        result = fetch("SELECT count(*) FROM users WHERE id = %s", (firebase_user.uid,))
+        if result is None or len(result) == 0:
+            raise PostgresError("No result from the database")
+
+        if result[0][0] != 0:
+            raise UserAlreadyExistsError(firebase_user.uid)
+
+        execute("INSERT INTO users (id, email, name) VALUES (%s, %s, %s)",
+                (firebase_user.uid, firebase_user.email, firebase_user.name))
 
         try:
             user = User.get_user_by_id(firebase_user.uid)
@@ -106,7 +116,8 @@ class User:
         return user
 
     def __str__(self):
-        return f'User(user_id="{self.uid}", email="{self.email}", name="{self.name}", accepted_currencies={self.accepted_currencies})'
+        return f'User(user_id="{self.uid}", email="{self.email}", name="{self.name}", ' \
+               f'accepted_currencies={self.accepted_currencies})'
 
     def __repr__(self):
         return f'User("{self.uid}", "{self.email}", "{self.name}", {self.accepted_currencies})'
