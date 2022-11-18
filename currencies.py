@@ -37,7 +37,9 @@ class Currency:
         Gets a currency by its symbol
 
         :param symbol: The symbol of the currency
+
         :return: The currency
+
         :raises CurrencyNotFoundError: If the currency does not exist
         """
         result = fetch("SELECT symbol, name, exchange_rate FROM currencies WHERE symbol = %s", (symbol,))
@@ -77,4 +79,3 @@ class Price:
             value = round(value, 0)
 
         return Price(value, other_currency)
-
