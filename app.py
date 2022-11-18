@@ -1,5 +1,6 @@
 # Flask import
 from flask import Flask, request
+from flask_cors import CORS
 
 # Exceptions import
 from exc import UserNotFoundError, CurrencyNotFoundError, PostgresError, FirebaseError, UserAlreadyExistsError, \
@@ -16,6 +17,8 @@ from offers import Offer
 from users import User
 
 app = Flask(__name__)
+CORS(app)
+
 initialize_firebase()
 
 
