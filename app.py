@@ -119,6 +119,11 @@ def handle_add_offer():
         return Error("Missing field: 'seller_id'").to_json(400)
 
     try:
+        price = int(price)
+    except ValueError:
+        return Error("Invalid price").to_json(400)
+
+    try:
         # TODO: Remove after implementing handling images
         images = Image.dummies()
         offer = Offer.new_offer_with_id(title, description, currency_symbol, price, seller_id, images, location)

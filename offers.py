@@ -100,12 +100,12 @@ class Offer:
         :raises PostgresError: If the offer could not be added to the database.
         """
         execute("INSERT INTO offers (seller_id, name, description, price, currency, created_at, location, images) "
-                "VALUES (%s, %s, %s, %s, %s, %s, '{}')",
+                "VALUES (%s, %s, %s, %s, %s, %s, %s, '{}')",
                 (self.seller.uid, self.title, self.description, self.price.amount, self.price.currency.symbol,
                  self.created_at, self.location))
 
         result = fetch("SELECT id FROM offers WHERE seller_id = %s AND name = %s AND description = %s "
-                       "AND price = %s AND currency = %s AND created_at = %s AND location = %s",
+                       "AND price = %s AND currency = %s AND created_at = %s AND location = %s "
                        "ORDER BY created_at DESC LIMIT 1",
                        (self.seller.uid, self.title, self.description, self.price.amount,
                         self.price.currency.symbol, self.created_at, self.location))
