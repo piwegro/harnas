@@ -17,7 +17,7 @@ from messages import Message
 from offers import Offer
 from users import User
 
-from json_encoder import APIEncoder
+from json_encoder import APIEncoder, as_json
 
 app = Flask(__name__)
 app.json_encoder = APIEncoder
@@ -29,6 +29,7 @@ initialize_firebase()
 
 # GETTING OFFERS
 # Get a single offer by  its id
+@as_json
 @app.route("/offer/<offer_id>", methods=["GET"])
 def hande_get_offer_by_id(offer_id: str):
     try:
@@ -41,6 +42,7 @@ def hande_get_offer_by_id(offer_id: str):
 
 
 # Get all offers for a query (paginated)
+@as_json
 @app.route("/offers/search/<query>/<page>", methods=["GET"])
 def handle_get_offers_by_query(query: str, page: int):
     try:
@@ -55,6 +57,7 @@ def handle_get_offers_by_query(query: str, page: int):
 
 
 # Get all offers (paginated)
+@as_json
 @app.route("/offers/<page>", methods=["GET"])
 def handle_get_all_offers(page: int):
     try:
@@ -69,6 +72,7 @@ def handle_get_all_offers(page: int):
 
 
 # Get all offers by a user id (not paginated)
+@as_json
 @app.route("/user/<user_id>/offers", methods=["GET"])
 def handle_get_offers_by_user_id(user_id: str):
     try:
@@ -82,6 +86,7 @@ def handle_get_offers_by_user_id(user_id: str):
 
 # ADDING OFFERS
 # Add a single offer
+@as_json
 @app.route("/offer", methods=["POST"])
 def handle_add_offer():
     # TODO: Handle images
@@ -150,6 +155,7 @@ def handle_add_offer():
 
 
 # Post images
+@as_json
 @app.route("/images", methods=["POST"])
 def handle_post_images():
     try:
@@ -162,6 +168,7 @@ def handle_post_images():
 # USER MANAGEMENT
 # Get a single user's info (including accepted currencies) by its id
 @app.route("/user/<user_id>", methods=["GET"])
+@as_json
 def handle_user_by_id(user_id: str):
     try:
         return User.get_user_by_id(user_id), 200
@@ -171,6 +178,7 @@ def handle_user_by_id(user_id: str):
 
 # Put a new user in the database (after sign up)
 @app.route("/user/<user_id>", methods=["PUT"])
+@as_json
 def handle_add_user_to_db(user_id: str):
     try:
         fuser = FirebaseUser.get_user_by_uid(user_id)
@@ -192,6 +200,7 @@ def handle_add_user_to_db(user_id: str):
 
 
 # Update a single user's info (including accepted currencies)
+@as_json
 @app.route("/user/<user_id>", methods=["PATCH"])
 def handle_update_user(user_id: str):
     return None, 204
@@ -199,6 +208,7 @@ def handle_update_user(user_id: str):
 
 # MESSAGES
 # Get all messages from and to a user
+@as_json
 @app.route("/user/<user_id>/conversations", methods=["GET"])
 def handle_get_user_conversations(user_id: str):
     try:
@@ -212,6 +222,7 @@ def handle_get_user_conversations(user_id: str):
 
 
 # Send a single new message to another user
+@as_json
 @app.route("/message", methods=["POST"])
 def handle_send_message():
     data = request.get_json()
@@ -245,6 +256,7 @@ def handle_send_message():
 
 # CURRENCIES
 # Get all currencies accepted by the system
+@as_json
 @app.route("/currencies", methods=["GET"])
 def handle_get_all_currencies():
     try:
@@ -256,6 +268,7 @@ def handle_get_all_currencies():
 
 # MISCELLANEOUS
 # Check the server's status
+@as_json
 @app.route("/health", methods=["GET"])
 def handle_health():
     status, message = check_health()
