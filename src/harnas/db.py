@@ -69,6 +69,8 @@ def fetch(query: str, params: tuple) -> List[Tuple]:
 
             return cursor.fetchall()
     except Exception as e:
+        disconnect()
+        connect()
         raise PostgresError(f"Error while fetching from Postgres: {e}")
 
 
@@ -93,4 +95,6 @@ def execute(query: str, params: tuple) -> None:
             cursor.execute(query, params)
             connection.commit()
     except Exception as e:
+        disconnect()
+        connect()
         raise PostgresError(f"Error while executing with Postgres: {e}")
