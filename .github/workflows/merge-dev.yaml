@@ -1,0 +1,20 @@
+name: Sync dev branch to main daily
+
+on:
+  schedule:
+    - cron: '45 1 * * *'
+
+jobs:
+  sync-branch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout the repository
+        uses: actions/checkout@v3
+
+      - name: Merge dev into main
+        uses: devmasx/merge-branch@master
+        with:
+          type: now
+          from_branch: dev
+          target_branch: main
+          github_token: ${{ github.token }}
