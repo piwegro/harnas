@@ -17,4 +17,6 @@ jobs:
           type: now
           from_branch: dev
           target_branch: main
+          message: Automated merge from dev to main
+          disable_fastforwards: true
           github_token: ${{ github.token }}
