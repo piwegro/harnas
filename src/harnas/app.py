@@ -29,8 +29,8 @@ initialize_firebase()
 
 # GETTING OFFERS
 # Get a single offer by  its id
-@as_json
 @app.route("/offer/<offer_id>", methods=["GET"])
+@as_json
 def hande_get_offer_by_id(offer_id: str):
     try:
         return Offer.get_offer_by_id(offer_id), 200
@@ -42,8 +42,8 @@ def hande_get_offer_by_id(offer_id: str):
 
 
 # Get all offers for a query (paginated)
-@as_json
 @app.route("/offers/search/<query>/<page>", methods=["GET"])
+@as_json
 def handle_get_offers_by_query(query: str, page: int):
     try:
         resp = make_response(Offer.search_offers(query, page))
@@ -57,8 +57,8 @@ def handle_get_offers_by_query(query: str, page: int):
 
 
 # Get all offers (paginated)
-@as_json
 @app.route("/offers/<page>", methods=["GET"])
+@as_json
 def handle_get_all_offers(page: int):
     try:
         resp = make_response(Offer.get_all_offers())
@@ -72,8 +72,8 @@ def handle_get_all_offers(page: int):
 
 
 # Get all offers by a user id (not paginated)
-@as_json
 @app.route("/user/<user_id>/offers", methods=["GET"])
+@as_json
 def handle_get_offers_by_user_id(user_id: str):
     try:
         return Offer.get_offers_by_user_id(user_id), 200
@@ -86,8 +86,8 @@ def handle_get_offers_by_user_id(user_id: str):
 
 # ADDING OFFERS
 # Add a single offer
-@as_json
 @app.route("/offer", methods=["POST"])
+@as_json
 def handle_add_offer():
     # TODO: Handle images
 
@@ -155,8 +155,8 @@ def handle_add_offer():
 
 
 # Post images
-@as_json
 @app.route("/images", methods=["POST"])
+@as_json
 def handle_post_images():
     try:
         return Image.dummies(), 201
@@ -200,16 +200,16 @@ def handle_add_user_to_db(user_id: str):
 
 
 # Update a single user's info (including accepted currencies)
-@as_json
 @app.route("/user/<user_id>", methods=["PATCH"])
+@as_json
 def handle_update_user(user_id: str):
     return None, 204
 
 
 # MESSAGES
 # Get all messages from and to a user
-@as_json
 @app.route("/user/<user_id>/conversations", methods=["GET"])
+@as_json
 def handle_get_user_conversations(user_id: str):
     try:
         result = Message.get_messages_by_user_id(user_id)
@@ -222,8 +222,8 @@ def handle_get_user_conversations(user_id: str):
 
 
 # Send a single new message to another user
-@as_json
 @app.route("/message", methods=["POST"])
+@as_json
 def handle_send_message():
     data = request.get_json()
 
@@ -256,8 +256,8 @@ def handle_send_message():
 
 # CURRENCIES
 # Get all currencies accepted by the system
-@as_json
 @app.route("/currencies", methods=["GET"])
+@as_json
 def handle_get_all_currencies():
     try:
         return Currency.get_currencies(), 200
@@ -268,8 +268,8 @@ def handle_get_all_currencies():
 
 # MISCELLANEOUS
 # Check the server's status
-@as_json
 @app.route("/health", methods=["GET"])
+@as_json
 def handle_health():
     status, message = check_health()
     status_code = 200 if status else 503
