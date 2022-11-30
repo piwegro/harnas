@@ -9,6 +9,7 @@ from images import Image
 from messages import Message
 from offers import Offer
 from users import User
+from review import Review
 
 from datetime import datetime
 
@@ -24,7 +25,8 @@ def as_json(func: Callable) -> Callable:
             o = result
 
         if isinstance(o, Error) or isinstance(o, Currency) or isinstance(o, Image) \
-                or isinstance(o, Message) or isinstance(o, Offer) or isinstance(o, User):
+                or isinstance(o, Message) or isinstance(o, Offer) or isinstance(o, User) \
+                or isinstance(o, Review):
             o = jsonify(o)
 
         if isinstance(result, tuple):
@@ -83,6 +85,13 @@ class APIEncoder(JSONEncoder):
                 'uid': obj.uid,
                 'name': obj.name,
                 'accepted_currencies': obj.accepted_currencies
+            }
+
+        if isinstance(obj, Review):
+            return {
+                'reviewer': obj.reviewer,
+                'reviewee': obj.reviewee,
+                'review': obj.review,
             }
 
         if isinstance(obj, datetime):

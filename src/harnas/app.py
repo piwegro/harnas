@@ -11,6 +11,7 @@ from exc import PostgresError, FirebaseError, \
 from currencies import Currency
 from error import Error
 from firebase import FirebaseUser, initialize_firebase
+from review import Review
 from health import check_health
 from images import Image
 from messages import Message
@@ -271,7 +272,33 @@ def handle_get_all_currencies():
 @app.route("/review", methods=["POST"])
 @as_json
 def handle_add_review():
-    pass
+    data = request.get_json()
+
+    try:
+        reviewer_id = data["reviewer_id"]
+    except KeyError:
+        return Error("Missing field: 'reviewer_id'"), 400
+
+    try:
+        reviewee_id = data["reviewee_id"]
+    except KeyError:
+        return Error("Missing field: 'reviewee_id'"), 400
+
+    try:
+        content = data["review"]
+    except KeyError:
+        return Error("Missing field: 'content'"), 400
+
+    try:
+        r = Review.new_review_with_ids(reviewer_id, reviewee_id, content)
+        r.add()
+    except UserNotFoundError:
+        return Error("At least one of the users not found"), 400
+    except Exception as e:
+        print("Exception:", e)
+        return Error("Internal server error"), 500
+
+    return r, 201
 
 
 # FAVORITES
