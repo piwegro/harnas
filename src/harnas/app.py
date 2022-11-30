@@ -116,7 +116,7 @@ def handle_add_offer():
     try:
         location = data["location"]
     except KeyError:
-        return Error("Missing field: 'location'"), 400
+        location = None
 
     try:
         images = data["images"]
