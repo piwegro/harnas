@@ -266,6 +266,29 @@ def handle_get_all_currencies():
         return Error("Internal server error"), 500
 
 
+# REVIEWS
+# Add a new review (or update an existing one)
+@app.route("/review", methods=["POST"])
+@as_json
+def handle_add_review():
+    pass
+
+
+# FAVORITES
+# Add an offer to a user's favorites
+@app.route("/favorite", methods=["PUT"])
+@as_json
+def handle_add_favorite():
+    pass
+
+
+# Remove an offer from a user's favorites
+@app.route("/favorite", methods=["DELETE"])
+@as_json
+def handle_remove_favorite():
+    pass
+
+
 # MISCELLANEOUS
 # Check the server's status
 @app.route("/health", methods=["GET"])
