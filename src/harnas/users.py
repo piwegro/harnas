@@ -17,6 +17,7 @@ class User:
     name: str
 
     accepted_currencies: list[Currency]
+    favorites: list["Offer"]
 
     @classmethod
     def get_user_by_id(cls, user_id: str) -> "User":
@@ -33,7 +34,7 @@ class User:
             raise UserNotFoundError(user_id)
 
         raw_user = result[0]
-        user = cls(raw_user[0], raw_user[1], raw_user[2], [])
+        user = cls(raw_user[0], raw_user[1], raw_user[2], [], [])
 
         result = fetch("SELECT name, symbol, exchange_rate FROM currencies WHERE symbol IN "
                        "(SELECT currency_symbol FROM accepted_currencies WHERE user_id = %s)",
