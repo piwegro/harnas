@@ -85,13 +85,14 @@ class Offer:
         try:
             currency = Currency.get_currency_by_symbol(raw_offer[5])
             user = User.get_user_by_id(raw_offer[1])
+            images = Image.get_images_by_offer_id(raw_offer[0])
         except UserNotFoundError:
             raise
         except CurrencyNotFoundError:
             raise
 
         return cls(raw_offer[0], raw_offer[2], raw_offer[3],
-                   Price(raw_offer[4], currency), user, Image.dummies(), raw_offer[8], raw_offer[7])
+                   Price(raw_offer[4], currency), user, images, raw_offer[8], raw_offer[7])
 
     def add(self) -> None:
         """
