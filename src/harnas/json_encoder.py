@@ -12,6 +12,9 @@ from users import User
 from review import Review
 
 from datetime import datetime
+from os import environ
+
+ROOT_URL = environ["ROOT_URL"]
 
 
 # TODO: Refactor
@@ -64,11 +67,25 @@ class APIEncoder(JSONEncoder):
             }
 
         if isinstance(obj, Image):
+            # Temporary solution
+            # TODO: Remove after updating the database
+            if "http" in obj.original:
+                return {
+                    'image_id': obj.image_id,
+                    'original': obj.original,
+                    'preview': obj.preview,
+                    'thumbnail': obj.thumbnail
+                }
+
+            original_url = ROOT_URL + '/images/' + obj.original
+            preview_url = ROOT_URL + '/images/' + obj.preview
+            thumbnail_url = ROOT_URL + '/images/' + obj.thumbnail
+
             return {
                 'image_id': obj.image_id,
-                'original': obj.original,
-                'preview': obj.preview,
-                'thumbnail': obj.thumbnail
+                'original': original_url,
+                'preview': preview_url,
+                'thumbnail': thumbnail_url
             }
 
         if isinstance(obj, Message):

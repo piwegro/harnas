@@ -58,8 +58,8 @@ class CurrencyNotFoundError (PostgresError):
 class OfferNotFoundError (PostgresError):
     """Raised when an offer is not found in the database."""
 
-    def __init__(self, offer_id: int):
-        super().__init__(f"Offer with id {offer_id} not found.")
+    def __init__(self, message: str):
+        super().__init__(message)
 
 
 class MessageAlreadySentError (PostgresError):
