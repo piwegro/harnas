@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from db import execute
+from db import execute, fetch
 
 from exc import PostgresError, UserNotFoundError
 
@@ -11,6 +11,21 @@ class Review:
     reviewer: User
     reviewee: User
     review: str
+
+    @classmethod
+    def get_reviews_for_user_id(cls, uid: str) -> list["Review"]:
+        """
+        Gets all reviews for the user with the given id.
+
+        :param uid: The id of the user.
+        :return: A list of reviews.
+        """
+        try:
+            reviews = fetch("SELECT reviewer, reviewee, review FROM reviews WHERE reviewee = %s", (uid,))
+        except Exception as e:
+            raise PostgresError(e)
+
+        return [cls(User.get_user_by_id(r[0]), User.get_user_by_id(r[1]), r[2]) for r in reviews]
 
     @classmethod
     def new_review_with_ids(cls, reviewer_id: str, reviewee_id: str, review: str) -> "Review":

@@ -313,6 +313,19 @@ def handle_add_review():
     return r, 201
 
 
+# Get all reviews for a user
+@app.route("/reviews/<user_id>", methods=["GET"])
+@as_json
+def handle_get_reviews(user_id: str):
+    try:
+        return Review.get_reviews_for_user_id(user_id), 200
+    except UserNotFoundError:
+        return Error("User not found"), 400
+    except Exception as e:
+        print("Exception:", e)
+        return Error("Internal server error"), 500
+
+
 # FAVORITES
 # Add an offer to a user's favorites
 @app.route("/favorite", methods=["PUT"])
