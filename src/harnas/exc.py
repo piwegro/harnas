@@ -70,3 +70,12 @@ class MessageAlreadySentError (PostgresError):
 
     def __str__(self):
         return f"Message with id {self.message.message_id} already sent."
+
+class BadTokenError (Exception):
+    """Raised when a user is not authorized to perform an action."""
+
+    def __init__(self, message: str):
+        self.message = message
+
+    def __str__(self):
+        return self.message
