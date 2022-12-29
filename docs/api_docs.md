@@ -1,13 +1,11 @@
-# API endpoints
-
 All non-ASCII characters are escaped, i.e. `ą` is replaced with `\u0105`.
 All of the responses are **not** pretty-printed in the production environment.
 
-## Types
+# Types
 
 At first we declare some primitive types:
 
-### Currency
+## Currency
 
 ```json
 {
@@ -22,7 +20,7 @@ At first we declare some primitive types:
 `value`: value of the currency
 
 
-#### Example object
+### Example object
 ```json
 {
     "name": "Harna\u015b",
@@ -31,7 +29,7 @@ At first we declare some primitive types:
 }
 ```
 
-### Price
+## Price
 
 ```json
 {
@@ -44,7 +42,7 @@ At first we declare some primitive types:
 `currency`: currency that the amount is in
 
 
-#### Example object
+### Example object
 ```json
 {
     "amount": 4,
@@ -56,7 +54,7 @@ At first we declare some primitive types:
   }
 ```
 
-### User
+## User
 
 ```json
 {
@@ -73,7 +71,7 @@ At first we declare some primitive types:
 `name`: user-readable name of the user \
 `uid`: unique id of the user
 
-#### Example object
+### Example object
 ```json
 {
   "accepted_currencies": [
@@ -88,7 +86,7 @@ At first we declare some primitive types:
 }
 ```
 
-### Offer
+## Offer
 
 ```json
 {
@@ -113,7 +111,7 @@ At first we declare some primitive types:
 `location`: location of the offer (textual)
 
 
-#### Example object
+### Example object
 
 ```json
 {
@@ -152,7 +150,7 @@ At first we declare some primitive types:
 }
 ```
 
-### Message
+## Message
 ```json
 {
     "content": <string>,
@@ -171,7 +169,7 @@ At first we declare some primitive types:
 `sender`: user that sent the message \
 `sent_at`: date and time of the message creation
 
-#### Example object
+### Example object
 ```json
 {
     "content": "Example message",
@@ -203,7 +201,7 @@ At first we declare some primitive types:
 }
 ```
 
-### Image
+## Image
 ```json
 {
     "image_id": <int>,
@@ -218,7 +216,7 @@ At first we declare some primitive types:
 `preview`:  URL of the image scaled to 200x113px  
 `thumbnail`: URL of the image scaled to 96x96px  
 
-#### Example object
+### Example object
 ```json
 {
     "image_id": 13,
@@ -228,7 +226,7 @@ At first we declare some primitive types:
 }
 ```
 
-### Error
+## Error
 ```json
 {
   "error": <string>
@@ -237,94 +235,94 @@ At first we declare some primitive types:
 
 `error`: user-readable error message
 
-#### Example object
+### Example object
 ```json
 {
   "error": "User with given email already exists"
 }
 ```
 
-## Date and time format
+# Date and time format
 All dates and times are formatted in the ISO 8601 format, e.g. `2019-05-18T15:17:00+00:00`.
 
-## Authorization
+# Authorization
 For the endpoints that require authorization, the `Authorization` header needs to be provided with the value 
 of `Bearer <token>`, where `<token>` is the token obtained from the Google Firebase Auth API.
 
 
-## General responses
+# General responses
 Those responses might be returned by any endpoint (are not specific to any endpoint).
 
-### 500 Internal Server Error
+## 500 Internal Server Error
 Might be returned if the server is unable to process the request because of
 an internal issue and not because of the request itself.
 
-#### Response
+### Response
 ```
 <Error>
 ```
 
-#### Example response
+### Example response
 ```json
 {
   "error": "The database cannot be accessed"
 }
 ```
 
-### 401 Unauthorized
+## 401 Unauthorized
 Is returned when the authentication token is missing or invalid.
 
-#### Response
+### Response
 ```
 <Error>
 ```
 
-#### Example response
+### Example response
 ```json
 {
   "error": "The 'Authorization' header is missing"
 }
 ```
 
-### 403 Forbidden
+## 403 Forbidden
 Is returned when the user is not authorized to perform the requested action.
 
-#### Response
+### Response
 ```
 <Error>
 ```
 
-#### Example response
+### Example response
 ```json
 {
   "error": "You are not authorized to perform this action"
 }
 ```
 
-## Endpoints
+# Endpoints
 
 The responses in case of 5XX errors are **not** guaranteed.
 
-### GET `/offer/<id>`
+## GET `/offer/<id>`
 Returns offer with given id.
 
-#### Parameters
+### Parameters
 `id`: id of the offer
 
-#### Authorization
+### Authorization
 None
 
-#### Responses
+### Responses
 
-##### 200 OK
+#### 200 OK
 The offer with a given id was found.
 
-###### Response body
+##### Response body
 ```
 <Offer>
 ```
 
-###### Example response body
+##### Example response body
 ```json
 {
   "created_at": "2019-05-18T15:17:00+00:00",
@@ -361,30 +359,30 @@ The offer with a given id was found.
   "location": "Gda\u0144sk"
 }
 ```
-##### 404 Not Found
+#### 404 Not Found
 The offer with a given id was not found.
 
-###### Response body
+##### Response body
 ```
 <Error>
 ```
 
-### GET `/offers/search/<query>/<page>`
+## GET `/offers/search/<query>/<page>`
 Returns offers matching given query. 
 Page with id 0 is the page with the most fitting offers.
 
-#### Parameters
+### Parameters
 `query`: query to search for \
 `page`: page of the results, 0 is always valid
 
-#### Authorization
+### Authorization
 None
 
-#### Responses
+### Responses
 
-##### 200 OK
+#### 200 OK
 
-###### Response body
+##### Response body
 ```json
 [
     <Offer>,
@@ -393,34 +391,34 @@ None
 ]
 ```
 
-###### Additional headers
+##### Additional headers
 | Header          | Description           |
 |-----------------|-----------------------|
 | `X-Total-Pages` | Total number of pages |
 
-##### 400 Bad Request
+#### 400 Bad Request
 The page number is invalid.
 
-###### Response body
+##### Response body
 ```
 <Error>
 ```
 
 
-### GET `/offers/<page>`
+## GET `/offers/<page>`
 Returns offers from given page. Page with id 0 is the newest page and is always valid.
 
-#### Parameters
+### Parameters
 `page`: page of the results, 0 is always valid
 
-#### Authorization
+### Authorization
 None
 
-#### Responses
+### Responses
 
-##### 200 OK
+#### 200 OK
 
-###### Response body
+##### Response body
 ```
 [
   <Offer>,
@@ -429,35 +427,35 @@ None
 ]
 ```
 
-###### Additional headers
+##### Additional headers
 | Header          | Description           |
 |-----------------|-----------------------|
 | `X-Total-Pages` | Total number of pages |
 
-##### 400 Bad Request
+#### 400 Bad Request
 The page id is invalid.
 
-###### Response body
+##### Response body
 ```
 <Error>
 ```
 
 
-### GET `/user/<id>/offers`
+## GET `/user/<id>/offers`
 Returns offers from given user.
 
-#### Parameters
+### Parameters
 `id`: id of the user
 
-#### Authorization
+### Authorization
 None
 
-#### Responses
+### Responses
 
-##### 200 OK
+#### 200 OK
 The user with a given id was found.
 
-###### Response body
+##### Response body
 ```
 [
   <Offer>,
@@ -467,22 +465,22 @@ The user with a given id was found.
 ```
 
 
-##### 400 Bad Request
+#### 400 Bad Request
 The user id is invalid.
 
-###### Response body
+##### Response body
 ```
 <Error>
 ```
 
 
-### POST `/offer`
+## POST `/offer`
 Creates new offer.
 
-#### Authorization
+### Authorization
 Needs to be authorized as any user.
 
-#### Request
+### Request
 ```json
 {
     "seller_id": <string>,
@@ -503,7 +501,7 @@ Needs to be authorized as any user.
 `location`: location of the offer \  
 `images`: array of the offer images  
 
-##### Example request
+#### Example request
 ```json
 {
     "seller_id": "KyumBFaY66ZdS3oG7fPZQZycKyC2",
@@ -523,16 +521,16 @@ Needs to be authorized as any user.
 }
 ```
 
-#### Responses
+### Responses
 
-##### 201 Created
+#### 201 Created
 
-###### Response body
+##### Response body
 ```
 <Offer>
 ```
 
-###### Example response body
+##### Example response body
 ```json
 {
     "created_at": "2019-05-18T15:17:00+00:00",
@@ -570,7 +568,7 @@ Needs to be authorized as any user.
 }
 ```
 
-#### 400 Bad Request
+### 400 Bad Request
 Probable causes
 - invalid seller id
 - invalid currency
@@ -578,19 +576,19 @@ Probable causes
 - invalid price
 - invalid image id
 
-#### Response
+### Response
 ```
 <Error>
 ```
 
 
-### POST `/images`
+## POST `/images`
 Uploads new image.
 
-#### Authorization
+### Authorization
 Needs to be authorized as any user.
 
-#### Request
+### Request
 Image file in the body of the request as multipart/form-data.
 
 Accepted file types:
@@ -598,44 +596,44 @@ Accepted file types:
 - image/png
 - image/gif
 
-#### Responses
+### Responses
 
-##### 201 Created
+#### 201 Created
 
-###### Response body
+##### Response body
 ```
 <Image>
 ```
 
-##### 400 Bad Request
+#### 400 Bad Request
 File type is not supported.
 
-###### Response body
+##### Response body
 ```
 <Error>
 ```
 
 
-### GET `/user/<id>`
+## GET `/user/<id>`
 Returns user with given id.
 
-#### Parameters
+### Parameters
 `id`: id of the user
 
-#### Authorization
+### Authorization
 None
 
-#### Responses
+### Responses
 
-##### 200 OK
+#### 200 OK
 The user with a given id was found.
 
-###### Response body
+##### Response body
 ```
 <User>
 ```
 
-###### Example response body
+##### Example response body
 ```json
 {
   "accepted_currencies": [
@@ -650,34 +648,34 @@ The user with a given id was found.
 }
 ```
 
-##### 404 Not Found
+#### 404 Not Found
 The user with a given id does not exist.
 
-###### Response body
+##### Response body
 ```
 <Error>
 ```
 
-### PUT `/user/<id>`
+## PUT `/user/<id>`
 Puts the user with given id. Should be called after the user is created.
 
-#### Parameters
+### Parameters
 `id`: id of the user
 
-#### Authorization
+### Authorization
 None
 
-#### Responses
+### Responses
 
-##### 201 Created
+#### 201 Created
 The user with a given id was created in the internal database.
 
-###### Response body
+##### Response body
 ```
 <User>
 ```
 
-###### Example response body
+##### Example response body
 ```json
 {
   "accepted_currencies": [
@@ -692,33 +690,33 @@ The user with a given id was created in the internal database.
 }
 ```
 
-##### 400 Bad Request
+#### 400 Bad Request
 The user with a given id does not exist in the Firebase Auth database.
 
-###### Response body
+##### Response body
 ```
 <Error>
 ```
 
-##### 409 Conflict
+#### 409 Conflict
 The user with a given id already exists in the internal database.
 
-###### Response body
+##### Response body
 ```
 <Error>
 ```
 
 
-### PATCH `/user/<id>`
+## PATCH `/user/<id>`
 Updates the user with given id.
 
-#### Parameters
+### Parameters
 `id`: id of the user
 
-#### Authorization
+### Authorization
 Needs to be authorized as the user with given id.
 
-#### Request body
+### Request body
 ```json
 {
     "name": <string>,
@@ -736,7 +734,7 @@ Needs to be authorized as the user with given id.
 If the field is not present, it will not be updated.
 The `currency` field, if present, must contain at least one currency symbol.
 
-##### Example request body
+#### Example request body
 ```json
 {
     "name": "Karol",
@@ -744,44 +742,44 @@ The `currency` field, if present, must contain at least one currency symbol.
 }
 ```
 
-#### Responses
+### Responses
 
-##### 200 OK
+#### 200 OK
 The user with a given id was updated.
 
-###### Response body
+##### Response body
 ```
 <User>
 ```
 
-##### 404 Not Found
+#### 404 Not Found
 The user with a given id does not exist.
 
-###### Response body
+##### Response body
 ```
 <Error>
 ```
 
-##### 400 Bad Request
+#### 400 Bad Request
 At least one of the currencies is invalid.
 
-###### Response body
+##### Response body
 ```
 <Error>
 ```
 
 
-### GET `/user/<id>/conversations`
+## GET `/user/<id>/conversations`
 Returns conversations for a given user.
 
-#### Parameters
+### Parameters
 `id`: id of the user
 
-#### Responses
+### Responses
 
-##### 200 OK
+#### 200 OK
 
-###### Response body
+##### Response body
 ```json
 [
   <Message>,
@@ -789,22 +787,22 @@ Returns conversations for a given user.
 ]
 ```
 
-##### 400 Bad Request
+#### 400 Bad Request
 The user id is invalid.
 
-#### Response body
+### Response body
 ```
 <Error>
 ```
 
 
-### POST `/message`
+## POST `/message`
 Creates and send a new message.
 
-#### Authorization
+### Authorization
 Needs to be authorized as a sender.
 
-#### Request body
+### Request body
 ```json
 {
     "sender_id": <string>,
@@ -817,7 +815,7 @@ Needs to be authorized as a sender.
 `conversation_id`: unique ID of the conversation \
 `content`: content of the message
 
-##### Example request body
+#### Example request body
 ```json
 {
     "sender_id": "KyumBFaY66ZdS3oG7fPZQZycKyC2",
@@ -826,17 +824,17 @@ Needs to be authorized as a sender.
 }
 ```
 
-#### Responses
+### Responses
 
-##### 201 Created
+#### 201 Created
 When the message was created and sent.
 
-###### Response body
+##### Response body
 ```
 <Message>
 ```
 
-###### Example response body
+##### Example response body
 ```json
 {
     "content": "Example test message",
@@ -868,26 +866,26 @@ When the message was created and sent.
 }
 ```
 
-##### 400 Bad Request
+#### 400 Bad Request
 The sender or receiver id is invalid or one of the fields is missing
 
-###### Response body
+##### Response body
 ```
 <Error>
 ```
 
 
-### GET `/currencies`
+## GET `/currencies`
 Returns all currencies.
 
-#### Authorization
+### Authorization
 None
 
-#### Responses
+### Responses
 
-##### 200 OK
+#### 200 OK
 
-###### Response body
+##### Response body
 ```json
 [
   <Currency>,
@@ -895,7 +893,7 @@ None
 ]
 ```
 
-###### Example response body
+##### Example response body
 ```json
 [
   {
@@ -906,19 +904,19 @@ None
 ]
 ```
 
-### GET `/health`
+## GET `/health`
 Returns health status of the server.
 
-#### Authorization
+### Authorization
 None
 
-#### Responses
+### Responses
 
-##### 200 OK
+#### 200 OK
 The server is healthy.
 
 
-###### Response body
+##### Response body
 ```json
 {
   "healthy": true,
@@ -926,10 +924,10 @@ The server is healthy.
 }
 ```
 
-##### 503 Service Unavailable
+#### 503 Service Unavailable
 The server is unhealthy.
 
-###### Response body
+##### Response body
 ```json
 {
   "healthy": false,
@@ -937,7 +935,7 @@ The server is unhealthy.
 }
 ```
 
-###### Example response body
+##### Example response body
 ```json
 {
   "healthy": false,
@@ -947,9 +945,9 @@ The server is unhealthy.
 
 Or no response at all if the server is down.
 
-## General flows
+# General flows
 
-### User creation
+## User creation
 1. User is created using the appropriate client side Google Firebase Auth method.
 2. A call to the internal API is made by the client to create an entry in the database by
 using the PUT method on the `/user/<id>` endpoint.
