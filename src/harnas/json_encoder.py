@@ -9,8 +9,12 @@ from images import Image
 from messages import Message
 from offers import Offer
 from users import User
+from review import Review
 
 from datetime import datetime
+from os import environ
+
+ROOT_URL = environ["ROOT_URL"]
 
 
 # TODO: Refactor
@@ -24,7 +28,8 @@ def as_json(func: Callable) -> Callable:
             o = result
 
         if isinstance(o, Error) or isinstance(o, Currency) or isinstance(o, Image) \
-                or isinstance(o, Message) or isinstance(o, Offer) or isinstance(o, User):
+                or isinstance(o, Message) or isinstance(o, Offer) or isinstance(o, User) \
+                or isinstance(o, Review):
             o = jsonify(o)
 
         if isinstance(result, tuple):
@@ -62,11 +67,25 @@ class APIEncoder(JSONEncoder):
             }
 
         if isinstance(obj, Image):
+            # Temporary solution
+            # TODO: Remove after updating the database
+            if "http" in obj.original:
+                return {
+                    'image_id': obj.image_id,
+                    'original': obj.original,
+                    'preview': obj.preview,
+                    'thumbnail': obj.thumbnail
+                }
+
+            original_url = ROOT_URL + '/images/' + obj.original
+            preview_url = ROOT_URL + '/images/' + obj.preview
+            thumbnail_url = ROOT_URL + '/images/' + obj.thumbnail
+
             return {
                 'image_id': obj.image_id,
-                'original': obj.original,
-                'preview': obj.preview,
-                'thumbnail': obj.thumbnail
+                'original': original_url,
+                'preview': preview_url,
+                'thumbnail': thumbnail_url
             }
 
         if isinstance(obj, Message):
@@ -83,6 +102,13 @@ class APIEncoder(JSONEncoder):
                 'uid': obj.uid,
                 'name': obj.name,
                 'accepted_currencies': obj.accepted_currencies
+            }
+
+        if isinstance(obj, Review):
+            return {
+                'reviewer': obj.reviewer,
+                'reviewee': obj.reviewee,
+                'review': obj.review,
             }
 
         if isinstance(obj, datetime):

@@ -1,5 +1,5 @@
 # Flask import
-from flask import Flask, request, make_response
+from flask import Flask, request, make_response, send_from_directory
 from flask_cors import CORS
 
 # Exceptions import
@@ -11,6 +11,7 @@ from exc import PostgresError, FirebaseError, \
 from currencies import Currency
 from error import Error
 from firebase import FirebaseUser, initialize_firebase
+from review import Review
 from health import check_health
 from images import Image
 from messages import Message
@@ -18,6 +19,7 @@ from offers import Offer
 from users import User
 
 from json_encoder import APIEncoder, as_json
+from os import environ
 
 app = Flask(__name__)
 app.json_encoder = APIEncoder
@@ -26,6 +28,7 @@ CORS(app)
 
 initialize_firebase()
 
+IMAGE_PATH = environ["IMAGE_OUTPUT"]
 
 # GETTING OFFERS
 # Get a single offer by  its id
@@ -155,14 +158,24 @@ def handle_add_offer():
 
 
 # Post images
-@app.route("/images", methods=["POST"])
+@app.route("/image", methods=["POST"])
 @as_json
 def handle_post_images():
+    body = request.get_data(cache=False)
+
     try:
-        return Image.dummies(), 201
+        img = Image.new_image_base64(body)
+        img.save()
+        return img, 201
+
     except Exception as e:
         print("Exception:", e)
         return Error("Internal server error"), 500
+
+
+@app.route("/image/<path:path>", methods=["GET"])
+def handle_get_image(path: str):
+    return send_from_directory(IMAGE_PATH, path)
 
 
 # USER MANAGEMENT
@@ -225,7 +238,7 @@ def handle_get_user_conversations(user_id: str):
 @app.route("/message", methods=["POST"])
 @as_json
 def handle_send_message():
-    data = request.get_json()
+    data = request.get_json(cache=False)
 
     try:
         sender_id = data["sender_id"]
@@ -271,7 +284,46 @@ def handle_get_all_currencies():
 @app.route("/review", methods=["POST"])
 @as_json
 def handle_add_review():
-    pass
+    data = request.get_json()
+
+    try:
+        reviewer_id = data["reviewer_id"]
+    except KeyError:
+        return Error("Missing field: 'reviewer_id'"), 400
+
+    try:
+        reviewee_id = data["reviewee_id"]
+    except KeyError:
+        return Error("Missing field: 'reviewee_id'"), 400
+
+    try:
+        content = data["review"]
+    except KeyError:
+        return Error("Missing field: 'content'"), 400
+
+    try:
+        r = Review.new_review_with_ids(reviewer_id, reviewee_id, content)
+        r.add()
+    except UserNotFoundError:
+        return Error("At least one of the users not found"), 400
+    except Exception as e:
+        print("Exception:", e)
+        return Error("Internal server error"), 500
+
+    return r, 201
+
+
+# Get all reviews for a user
+@app.route("/reviews/<user_id>", methods=["GET"])
+@as_json
+def handle_get_reviews(user_id: str):
+    try:
+        return Review.get_reviews_for_user_id(user_id), 200
+    except UserNotFoundError:
+        return Error("User not found"), 400
+    except Exception as e:
+        print("Exception:", e)
+        return Error("Internal server error"), 500
 
 
 # FAVORITES
