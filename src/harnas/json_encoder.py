@@ -4,7 +4,7 @@ from flask import jsonify
 from typing import Any, Callable
 
 from error import Error
-from currencies import Currency
+from currencies import Currency, Price
 from images import Image
 from messages import Message
 from offers import Offer
@@ -49,12 +49,16 @@ class APIEncoder(JSONEncoder):
             }
 
         if isinstance(obj, Offer):
+            prices = []
+            for c in obj.seller.accepted_currencies:
+                prices.append(obj.price.convert_to(c))
+
             return {
                 'offer_id': obj.offer_id,
                 'title': obj.title,
                 'description': obj.description,
-                'price': obj.price,
-                'seller': obj.seller,
+                'price': prices,
+                'seller_id': obj.seller.uid,
                 'images': obj.images,
                 'location': obj.location,
                 'created_at': obj.created_at
@@ -91,10 +95,16 @@ class APIEncoder(JSONEncoder):
         if isinstance(obj, Message):
             return {
                 'message_id': obj.message_id,
-                'sender': obj.sender,
-                'receiver': obj.receiver,
+                'sender_id': obj.sender.uid,
+                'receiver_id': obj.receiver.uid,
                 'content': obj.content,
                 'sent_at': obj.sent_at
+            }
+
+        if isinstance(obj, Price):
+            return {
+                'amount': obj.amount,
+                'currency': obj.currency
             }
 
         if isinstance(obj, User):
@@ -106,8 +116,8 @@ class APIEncoder(JSONEncoder):
 
         if isinstance(obj, Review):
             return {
-                'reviewer': obj.reviewer,
-                'reviewee': obj.reviewee,
+                'reviewer_id': obj.reviewer.uid,
+                'reviewee_id': obj.reviewee.uid,
                 'review': obj.review,
             }
 
