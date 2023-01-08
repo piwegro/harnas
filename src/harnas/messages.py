@@ -105,6 +105,35 @@ class Message:
 
         return m
 
+    @classmethod
+    def get_messages_beetween_user_ids(cls, user_id_1: str, user_id_2: str) -> list["Message"]:
+        """
+        Get all messages sent between two users.
+
+        :param user_id_1: The id of the first user.
+        :param user_id_2: The id of the second user.
+        :raises UserNotFoundError: If one of the users does not exist.
+        :return: A list of messages.
+        """
+
+        try:
+            User.get_user_by_id(user_id_1)
+            User.get_user_by_id(user_id_2)
+        except UserNotFoundError:
+            raise
+
+        m = []
+
+        result = fetch("SELECT * FROM messages WHERE (sender_id = %s AND receiver_id = %s) OR "
+                       "(sender_id = %s AND receiver_id = %s)", (user_id_1, user_id_2, user_id_2, user_id_1))
+
+        for raw_message in result:
+            sender = User.get_user_by_id(raw_message[1])
+            receiver = User.get_user_by_id(raw_message[2])
+            m.append(cls(raw_message[0], sender, receiver, raw_message[3], raw_message[4]))
+
+        return m
+
     def __str__(self) -> str:
         return f"Message {self.message_id} from {self.sender.uid} to {self.receiver.uid} at {self.sent_at}"
 

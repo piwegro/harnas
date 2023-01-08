@@ -220,8 +220,20 @@ def handle_update_user(user_id: str):
 
 
 # MESSAGES
+# Get all messages beetwen two users
+@app.route("/messages/<user1_id>/<user2_id>", methods=["GET"])
+@as_json
+def handle_get_conversation(user1_id: str, user2_id: str):
+    try:
+        return Message.get_messages_beetween_user_ids(user1_id, user2_id), 200
+    except UserNotFoundError:
+        return Error("User not found"), 400
+    except Exception as e:
+        print("Exception:", e)
+        return Error("Internal server error"), 500
+
 # Get all messages from and to a user
-@app.route("/user/<user_id>/conversations", methods=["GET"])
+@app.route("/messages/<user_id>", methods=["GET"])
 @as_json
 def handle_get_user_conversations(user_id: str):
     try:
