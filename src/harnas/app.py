@@ -138,7 +138,7 @@ def handle_add_offer():
 
     try:
         # TODO: Remove after implementing handling images
-        images = Image.dummies()
+        # images = Image.dummies()
         offer = Offer.new_offer_with_id(title, description, currency_symbol, price, seller_id, images, location)
     except UserNotFoundError:
         return Error("User not found"), 400

@@ -489,7 +489,7 @@ Needs to be authorized as any user.
     "title": <string>,
     "description": <string>,
     "location": <string>,
-    "images": <array[<File>]>
+    "images": <array[<int>]>
 }
 ```
 
@@ -499,7 +499,7 @@ Needs to be authorized as any user.
 `title`: title of the offer \
 `description`: description \
 `location`: location of the offer \  
-`images`: array of the offer images  
+`images`: array of the ids of images
 
 #### Example request
 ```json

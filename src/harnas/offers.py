@@ -47,7 +47,7 @@ class Offer:
 
     @classmethod
     def new_offer_with_id(cls, title: str, description: str, currency_symbol: str, amount: int,
-                          seller_id: str, images: List[Image], location: str) -> "Offer":
+                          seller_id: str, images: List[int], location: str) -> "Offer":
         """
         Creates a new offer, but with seller id instead of seller object.
 
@@ -57,7 +57,7 @@ class Offer:
         :param amount: The amount of the currency.
         :param seller_id: The id of the seller.
         :param location: The location of the offer.
-        :param images: The list of links to the images.
+        :param images: The list of ids of the images.
 
         :raises UserNotFoundError: If the user with the given id does not exist.
         :raises CurrencyNotFoundError: If the currency with the given symbol does not exist.
@@ -72,7 +72,12 @@ class Offer:
         except CurrencyNotFoundError:
             raise
 
-        return cls(None, title, description, Price(amount, currency), seller, images, location, datetime.now())
+        try:
+            parsed_images = [Image.get_image_by_id(image_id) for image_id in images]
+        except Exception:
+            raise
+
+        return cls(None, title, description, Price(amount, currency), seller, parsed_images, location, datetime.now())
 
     @classmethod
     def new_offer_from_row(cls, raw_offer) -> "Offer":
@@ -85,10 +90,15 @@ class Offer:
         try:
             currency = Currency.get_currency_by_symbol(raw_offer[5])
             user = User.get_user_by_id(raw_offer[1])
-            images = Image.get_images_by_offer_id(raw_offer[0])
         except UserNotFoundError:
             raise
         except CurrencyNotFoundError:
+            raise
+
+        try:
+            res = fetch("SELECT id FROM images WHERE offer_id = %s", (raw_offer[0],))
+            images = [Image.get_image_by_id(image_id[0]) for image_id in res]
+        except Exception:
             raise
 
         return cls(raw_offer[0], raw_offer[2], raw_offer[3],
@@ -100,21 +110,20 @@ class Offer:
 
         :raises PostgresError: If the offer could not be added to the database.
         """
-        execute("INSERT INTO offers (seller_id, name, description, price, currency, created_at, location, images) "
-                "VALUES (%s, %s, %s, %s, %s, %s, %s, '{}')",
+        # Add an offer to the database
+        result = fetch("INSERT INTO offers (seller_id, name, description, price, currency, created_at, location, images) "
+                "VALUES (%s, %s, %s, %s, %s, %s, %s, '{}') RETURNING id",
                 (self.seller.uid, self.title, self.description, self.price.amount, self.price.currency.symbol,
                  self.created_at, self.location))
-
-        result = fetch("SELECT id FROM offers WHERE seller_id = %s AND name = %s AND description = %s "
-                       "AND price = %s AND currency = %s AND created_at = %s AND location = %s "
-                       "ORDER BY created_at DESC LIMIT 1",
-                       (self.seller.uid, self.title, self.description, self.price.amount,
-                        self.price.currency.symbol, self.created_at, self.location))
 
         if result is None or len(result) == 0:
             raise PostgresError("The offer was not added to the database.")
 
         self.offer_id = result[0][0]
+
+        # Associate the images with the offer
+        for image in self.images:
+            image.associate_with_offer(self.offer_id)
 
     @classmethod
     def get_all_offers(cls) -> list["Offer"]:
