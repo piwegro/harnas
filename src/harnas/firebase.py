@@ -78,7 +78,7 @@ def initialize_firebase() -> None:
     firebase_app = firebase_admin.initialize_app(cred)
 
 
-def verify_token(token: str):
+def verify_token(token: str) -> str:
     """
     Verifies the token and returns the user id
 
