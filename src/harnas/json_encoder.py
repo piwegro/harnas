@@ -29,7 +29,7 @@ def as_json(func: Callable) -> Callable:
 
         if isinstance(o, Error) or isinstance(o, Currency) or isinstance(o, Image) \
                 or isinstance(o, Message) or isinstance(o, Offer) or isinstance(o, User) \
-                or isinstance(o, Review):
+                or isinstance(o, Review) or isinstance(o, Price):
             o = jsonify(o)
 
         if isinstance(result, tuple):
@@ -67,7 +67,8 @@ class APIEncoder(JSONEncoder):
         if isinstance(obj, Currency):
             return {
                 'symbol': obj.symbol,
-                'name': obj.name
+                'name': obj.name,
+                'value': obj.value
             }
 
         if isinstance(obj, Image):
