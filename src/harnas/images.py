@@ -7,7 +7,7 @@ from uuid import uuid4
 from os import environ
 from pathlib import Path
 
-from db import fetch
+from db import fetch, execute
 
 from PIL import Image as PILImage
 import pillow_heif
@@ -157,3 +157,16 @@ class Image:
                 (original_name, preview_name, thumbnail_name))
 
         self.image_id = int(result[0][0])
+
+
+    def associate_with_offer(self, offer_id: int) -> None:
+        """
+        Associates the image with the offer with the given id.
+
+        :param offer_id: The id of the offer.
+        :return: None
+        """
+        if not self.is_saved:
+            raise Exception()
+
+        execute("UPDATE images SET offer_id = %s WHERE id = %s", (offer_id, self.image_id))
