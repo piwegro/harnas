@@ -94,8 +94,8 @@ At first we declare some primitive types:
   "description": <string>,
   "id": <int>,
   "images": <array[<Image>]>,
-  "price": <Price>,
-  "seller": <User>,
+  "price": <array[<Price>]>,
+  "seller_id": <string>,
   "title": <string>,
   "location": <string>
 }
@@ -106,7 +106,7 @@ At first we declare some primitive types:
 `id`: unique id of the offer \
 `images`: array of the offer images \
 `price`: price of the offer \
-`seller`: user that created the offer \
+`seller_id`: id of the user that created the offer \
 `title`: title of the offer \
 `location`: location of the offer (textual)
 
@@ -115,38 +115,44 @@ At first we declare some primitive types:
 
 ```json
 {
-  "created_at": "2019-05-18T15:17:00+00:00",
-  "description": "Bardzo \u0142adna p\u00f3\u0142eczka we wspania\u0142ym stanie",
-  "id": 1,
+  "created_at": "2022-10-31T18:32:19",
+  "description": "Bardzo ładna półeczka we wspaniałym stanie",
   "images": [
     {
-      "image_id": 13,
-      "original": "https://cdn.piwegro.lol/images/13/original.png",
-      "preview": "https://cdn.piwegro.lol/images/13/preview.png",
-      "thumbnail": "https://cdn.piwegro.lol/images/13/thumbnail.png"
+      "image_id": 1,
+      "original": "http://localhost:8080/images/cb1a6d25-403d-4b96-aef2-29eef9d84c60_original.jpg",
+      "preview": "http://localhost:8080/images/cb1a6d25-403d-4b96-aef2-29eef9d84c60_preview.jpg",
+      "thumbnail": "http://localhost:8080/images/cb1a6d25-403d-4b96-aef2-29eef9d84c60_thumbnail.jpg"
+    },
+    {
+      "image_id": 3,
+      "original": "http://localhost:8080/images/cb1a6d25-403d-4b96-aef2-29eef9d84c60_original.jpg",
+      "preview": "http://localhost:8080/images/cb1a6d25-403d-4b96-aef2-29eef9d84c60_preview.jpg",
+      "thumbnail": "http://localhost:8080/images/cb1a6d25-403d-4b96-aef2-29eef9d84c60_thumbnail.jpg"
+    },
+  ],
+  "location": "Kraków",
+  "offer_id": 1,
+  "price": [
+    {
+      "amount": 4.0,
+      "currency": {
+        "name": "Harnaś",
+        "symbol": "HAR",
+        "value": 1.0
+      }
+    },
+    {
+      "amount": 2.0,
+      "currency": {
+        "name": "Tyskie",
+        "symbol": "TYS",
+        "value": 1.9
+      }
     }
   ],
-  "price": {
-    "amount": 4,
-    "currency": {
-      "name": "Harna\u015b",
-      "symbol": "HAR",
-      "value": 1
-    }
-  },
-  "seller": {
-    "accepted_currencies": [
-      {
-        "name": "Harna\u015b",
-        "symbol": "HAR",
-        "value": 1
-      }
-    ],
-    "name": "Karol",
-    "uid": "KyumBFaY66ZdS3oG7fPZQZycKyC2"
-  },
-  "title": "P\u00f3\u0142eczka",
-  "location": "Gda\u0144sk"
+  "seller_id": "KyumBFaY66ZdS3oG7fPZQZycKyC2",
+  "title": "Półeczka"
 }
 ```
 
@@ -163,41 +169,19 @@ At first we declare some primitive types:
 ```
 
 `content`: content of the message \
-`is_sent`: whether the message was sent by the current user \
 `message_id`: unique id of the message \
-`receiver`: user that received the message \
-`sender`: user that sent the message \
+`receiver_id`: id of the user that received the message \
+`sender_id`: id of the user that sent the message \
 `sent_at`: date and time of the message creation
 
 ### Example object
 ```json
 {
-    "content": "Example message",
-    "is_sent": true,
-    "message_id": 7,
-    "receiver": {
-        "accepted_currencies": [
-            {
-                "name": "Harna\u015b",
-                "symbol": "HAR",
-                "value": 1.0
-            }
-        ],
-        "name": "John",
-        "uid": "iELOTJC3k6VMCrrtamFq7907REz1"
-    },
-    "sender": {
-        "accepted_currencies": [
-            {
-                "name": "Harna\u015b",
-                "symbol": "HAR",
-                "value": 1.0
-            }
-        ],
-        "name": "Karol",
-        "uid": "KyumBFaY66ZdS3oG7fPZQZycKyC2"
-    },
-    "sent_at": "2019-05-18T15:17:00+00:00"
+  "content": "Hello",
+  "message_id": 1,
+  "receiver_id": "iELOTJC3k6VMCrrtamFq7907REz1",
+  "sender_id": "KyumBFaY66ZdS3oG7fPZQZycKyC2",
+  "sent_at": "2022-11-09T16:58:44.039167"
 }
 ```
 
@@ -325,38 +309,50 @@ The offer with a given id was found.
 ##### Example response body
 ```json
 {
-  "created_at": "2019-05-18T15:17:00+00:00",
-  "description": "Bardzo \u0142adna p\u00f3\u0142eczka we wspania\u0142ym stanie",
-  "id": 1,
+  "created_at": "2022-10-31T18:32:19",
+  "description": "Bardzo ładna półeczka we wspaniałym stanie",
   "images": [
     {
-      "image_id": 13,
-      "original": "https://cdn.piwegro.lol/images/13/original.png",
-      "preview": "https://cdn.piwegro.lol/images/13/preview.png",
-      "thumbnail": "https://cdn.piwegro.lol/images/13/thumbnail.png"
+      "image_id": 1,
+      "original": "http://localhost:8080/images/cb1a6d25-403d-4b96-aef2-29eef9d84c60_original.jpg",
+      "preview": "http://localhost:8080/images/cb1a6d25-403d-4b96-aef2-29eef9d84c60_preview.jpg",
+      "thumbnail": "http://localhost:8080/images/cb1a6d25-403d-4b96-aef2-29eef9d84c60_thumbnail.jpg"
+    },
+    {
+      "image_id": 3,
+      "original": "http://localhost:8080/images/cb1a6d25-403d-4b96-aef2-29eef9d84c60_original.jpg",
+      "preview": "http://localhost:8080/images/cb1a6d25-403d-4b96-aef2-29eef9d84c60_preview.jpg",
+      "thumbnail": "http://localhost:8080/images/cb1a6d25-403d-4b96-aef2-29eef9d84c60_thumbnail.jpg"
+    },
+    {
+      "image_id": 2,
+      "original": "http://localhost:8080/images/cb1a6d25-403d-4b96-aef2-29eef9d84c60_original.jpg",
+      "preview": "http://localhost:8080/images/cb1a6d25-403d-4b96-aef2-29eef9d84c60_preview.jpg",
+      "thumbnail": "http://localhost:8080/images/cb1a6d25-403d-4b96-aef2-29eef9d84c60_thumbnail.jpg"
     }
   ],
-  "price": {
-    "amount": 4,
-    "currency": {
-      "name": "Harna\u015b",
-      "symbol": "HAR",
-      "value": 1
-    }
-  },
-  "seller": {
-    "accepted_currencies": [
-      {
-        "name": "Harna\u015b",
+  "location": "Kraków",
+  "offer_id": 1,
+  "price": [
+    {
+      "amount": 4.0,
+      "currency": {
+        "name": "Harnaś",
         "symbol": "HAR",
-        "value": 1
+        "value": 1.0
       }
-    ],
-    "name": "Karol",
-    "uid": "KyumBFaY66ZdS3oG7fPZQZycKyC2"
-  },
-  "title": "P\u00f3\u0142eczka",
-  "location": "Gda\u0144sk"
+    },
+    {
+      "amount": 2.0,
+      "currency": {
+        "name": "Tyskie",
+        "symbol": "TYS",
+        "value": 1.9
+      }
+    }
+  ],
+  "seller_id": "KyumBFaY66ZdS3oG7fPZQZycKyC2",
+  "title": "Półeczka"
 }
 ```
 #### 404 Not Found
@@ -489,7 +485,7 @@ Needs to be authorized as any user.
     "title": <string>,
     "description": <string>,
     "location": <string>,
-    "images": <array[<File>]>
+    "images": <array[<int>]>
 }
 ```
 
@@ -498,26 +494,18 @@ Needs to be authorized as any user.
 `price`: amount of the currency \
 `title`: title of the offer \
 `description`: description \
-`location`: location of the offer \  
-`images`: array of the offer images  
+`location`: location of the offer (optional) \  
+`images`: array of the ids of images
 
 #### Example request
 ```json
 {
-    "seller_id": "KyumBFaY66ZdS3oG7fPZQZycKyC2",
-    "currency": "HAR",
-    "price": 2,
-    "title": "Beautiful offer",
-    "description": "Example description of this beautiful offer",
-    "location": "Gdańsk",
-    "images": [
-        {
-            "file": {
-                "filename": "image.png",
-                "contents": "..."
-            }
-        }
-    ]
+  "seller_id": "KyumBFaY66ZdS3oG7fPZQZycKyC2",
+  "currency": "HAR",
+  "price": 10,
+  "title": "Test ze zdjęciem",
+  "description": "Test ze zdjęciem",
+  "images": [16, 17]
 }
 ```
 
@@ -533,38 +521,47 @@ Needs to be authorized as any user.
 ##### Example response body
 ```json
 {
-    "created_at": "2019-05-18T15:17:00+00:00",
-    "description": "Example description of this beautiful offer",
-    "id": 3,
-    "images": [
+  "created_at": "2023-01-08T17:36:48.316588",
+  "description": "Test ze zdjęciem",
+  "images": [
+    {
+      "image_id": 16,
+      "original": "http://localhost:8080/images/cb1a6d25-403d-4b96-aef2-29eef9d84c60_original.jpg",
+      "preview": "http://localhost:8080/images/cb1a6d25-403d-4b96-aef2-29eef9d84c60_preview.jpg",
+      "thumbnail": "http://localhost:8080/images/cb1a6d25-403d-4b96-aef2-29eef9d84c60_thumbnail.jpg"
+    },
+    {
+      "image_id": 17,
+      "original": "http://localhost:8080/images/cb1a6d25-403d-4b96-aef2-29eef9d84c60_original.jpg",
+      "preview": "http://localhost:8080/images/cb1a6d25-403d-4b96-aef2-29eef9d84c60_preview.jpg",
+      "thumbnail": "http://localhost:8080/images/cb1a6d25-403d-4b96-aef2-29eef9d84c60_thumbnail.jpg"
+    }
+  ],
+  "location": null,
+  "offer_id": 6,
+  "price": {
+    "amount": 10,
+    "currency": {
+      "name": "Harnaś",
+      "symbol": "HAR",
+      "value": 1.0
+    }
+  },
+  "seller": {
+    "accepted_currencies": [
       {
-        "image_id": 13,
-        "original": "https://cdn.piwegro.lol/images/13/original.png",
-        "preview": "https://cdn.piwegro.lol/images/13/preview.png",
-        "thumbnail": "https://cdn.piwegro.lol/images/13/thumbnail.png"
+        "name": "Harnaś",
+        "symbol": "HAR"
+      },
+      {
+        "name": "Tyskie",
+        "symbol": "TYS"
       }
     ],
-    "price": {
-        "amount": 2,
-        "currency": {
-            "name": "Harna\u015b",
-            "symbol": "HAR",
-            "value": 1.0
-        }
-    },
-    "seller": {
-        "accepted_currencies": [
-            {
-                "name": "Harna\u015b",
-                "symbol": "HAR",
-                "value": 1.0
-            }
-        ],
-        "name": "Karol",
-        "uid": "KyumBFaY66ZdS3oG7fPZQZycKyC2"
-    },
-    "title": "Beautiful offer",
-    "location": "Gda\u0144sk"
+    "name": "Karol",
+    "uid": "KyumBFaY66ZdS3oG7fPZQZycKyC2"
+  },
+  "title": "Test ze zdjęciem"
 }
 ```
 
@@ -582,19 +579,20 @@ Probable causes
 ```
 
 
-## POST `/images`
+## POST `/image`
 Uploads new image.
 
 ### Authorization
 Needs to be authorized as any user.
 
 ### Request
-Image file in the body of the request as multipart/form-data.
+Image file in the body of the request as base64 encoded string.
 
 Accepted file types:
 - image/jpeg
 - image/png
 - image/gif
+- image/heic, image/heif
 
 ### Responses
 
@@ -638,9 +636,14 @@ The user with a given id was found.
 {
   "accepted_currencies": [
     {
-      "name": "Harna\u015b",
+      "name": "Harnaś",
       "symbol": "HAR",
       "value": 1.0
+    },
+    {
+      "name": "Tyskie",
+      "symbol": "TYS",
+      "value": 1.9
     }
   ],
   "name": "Karol",
@@ -680,9 +683,14 @@ The user with a given id was created in the internal database.
 {
   "accepted_currencies": [
     {
-      "name": "Harna\u015b",
+      "name": "Harnaś",
       "symbol": "HAR",
       "value": 1.0
+    },
+    {
+      "name": "Tyskie",
+      "symbol": "TYS",
+      "value": 1.9
     }
   ],
   "name": "Karol",
@@ -769,11 +777,38 @@ At least one of the currencies is invalid.
 ```
 
 
-## GET `/user/<id>/conversations`
+## GET `/messages/<id>`
 Returns conversations for a given user.
 
 ### Parameters
 `id`: id of the user
+
+### Responses
+
+#### 200 OK
+
+##### Response body
+```json
+[
+  <Message>,
+  <Message>
+]
+```
+
+#### 400 Bad Request
+The user id is invalid.
+
+### Response body
+```
+<Error>
+```
+
+## GET `/messages/<id1>/<id2>`
+Returns conversations between two users.
+
+### Parameters
+`id1`: id of the first user
+`id2`: id of the second user
 
 ### Responses
 
@@ -837,32 +872,11 @@ When the message was created and sent.
 ##### Example response body
 ```json
 {
-    "content": "Example test message",
-    "is_sent": true,
-    "message_id": 7,
-    "receiver": {
-        "accepted_currencies": [
-            {
-                "name": "Harna\u015b",
-                "symbol": "HAR",
-                "value": 1.0
-            }
-        ],
-        "name": "John",
-        "uid": "iELOTJC3k6VMCrrtamFq7907REz1"
-    },
-    "sender": {
-        "accepted_currencies": [
-            {
-                "name": "Harna\u015b",
-                "symbol": "HAR",
-                "value": 1.0
-            }
-        ],
-        "name": "Karol",
-        "uid": "KyumBFaY66ZdS3oG7fPZQZycKyC2"
-    },
-    "sent_at": "2019-05-18T15:17:00+00:00"
+  "content": "Hello",
+  "message_id": 1,
+  "receiver_id": "iELOTJC3k6VMCrrtamFq7907REz1",
+  "sender_id": "KyumBFaY66ZdS3oG7fPZQZycKyC2",
+  "sent_at": "2022-11-09T16:58:44.039167"
 }
 ```
 

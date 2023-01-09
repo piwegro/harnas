@@ -10,7 +10,7 @@ from exc import PostgresError, FirebaseError, \
 # Functions and classes import
 from currencies import Currency
 from error import Error
-from firebase import FirebaseUser, initialize_firebase
+from firebase import FirebaseUser, initialize_firebase, verify_token
 from review import Review
 from health import check_health
 from images import Image
@@ -92,7 +92,12 @@ def handle_get_offers_by_user_id(user_id: str):
 @app.route("/offer", methods=["POST"])
 @as_json
 def handle_add_offer():
-    # TODO: Handle images
+    # TODO: Handle it better
+    try:
+        seller_id = verify_token(request.headers["Authorization"].split(" ")[1])
+    except Exception as e:
+        print("Exception:", e)
+        return Error("Unauthorized"), 401
 
     data = request.get_json()
 
@@ -127,18 +132,11 @@ def handle_add_offer():
         return Error("Missing field: 'images'"), 400
 
     try:
-        seller_id = data["seller_id"]
-    except KeyError:
-        return Error("Missing field: 'seller_id'"), 400
-
-    try:
         price = int(price)
     except ValueError:
         return Error("Invalid price"), 400
 
     try:
-        # TODO: Remove after implementing handling images
-        images = Image.dummies()
         offer = Offer.new_offer_with_id(title, description, currency_symbol, price, seller_id, images, location)
     except UserNotFoundError:
         return Error("User not found"), 400
@@ -161,6 +159,13 @@ def handle_add_offer():
 @app.route("/image", methods=["POST"])
 @as_json
 def handle_post_images():
+    # TODO: Handle it better
+    try:
+        verify_token(request.headers["Authorization"].split(" ")[1])
+    except Exception as e:
+        print("Exception:", e)
+        return Error("Unauthorized"), 401
+
     body = request.get_data(cache=False)
 
     try:
@@ -220,10 +225,35 @@ def handle_update_user(user_id: str):
 
 
 # MESSAGES
-# Get all messages from and to a user
-@app.route("/user/<user_id>/conversations", methods=["GET"])
+# Get all messages beetwen two users
+@app.route("/messages/<user_id>", methods=["GET"])
 @as_json
-def handle_get_user_conversations(user_id: str):
+def handle_get_conversation(user_id: str):
+    try:
+        current_user = verify_token(request.headers["Authorization"].split(" ")[1])
+    except Exception as e:
+        print("Exception:", e)
+        return Error("Unauthorized"), 401
+
+    try:
+        return Message.get_messages_beetween_user_ids(user_id, current_user), 200
+    except UserNotFoundError:
+        return Error("User not found"), 400
+    except Exception as e:
+        print("Exception:", e)
+        return Error("Internal server error"), 500
+
+# Get all messages from and to a user
+@app.route("/messages", methods=["GET"])
+@as_json
+def handle_get_user_conversations():
+    # TODO: Handle it better
+    try:
+        user_id = verify_token(request.headers["Authorization"].split(" ")[1])
+    except Exception as e:
+        print("Exception:", e)
+        return Error("Unauthorized"), 401
+
     try:
         result = Message.get_messages_by_user_id(user_id)
         return result, 200
@@ -238,12 +268,14 @@ def handle_get_user_conversations(user_id: str):
 @app.route("/message", methods=["POST"])
 @as_json
 def handle_send_message():
-    data = request.get_json(cache=False)
-
+    # TODO: Handle it better
     try:
-        sender_id = data["sender_id"]
-    except KeyError:
-        return Error("Missing field: sender_id"), 400
+        sender_id = verify_token(request.headers["Authorization"].split(" ")[1])
+    except Exception as e:
+        print("Exception:", e)
+        return Error("Unauthorized"), 401
+
+    data = request.get_json(cache=False)
 
     try:
         receiver_id = data["receiver_id"]
@@ -286,10 +318,12 @@ def handle_get_all_currencies():
 def handle_add_review():
     data = request.get_json()
 
+    # TODO: Handle it better
     try:
-        reviewer_id = data["reviewer_id"]
-    except KeyError:
-        return Error("Missing field: 'reviewer_id'"), 400
+        reviewer_id = verify_token(request.headers["Authorization"].split(" ")[1])
+    except Exception as e:
+        print("Exception:", e)
+        return Error("Unauthorized"), 401
 
     try:
         reviewee_id = data["reviewee_id"]

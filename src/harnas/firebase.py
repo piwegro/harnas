@@ -1,7 +1,7 @@
 import firebase_admin
 
 # Exceptions import
-from exc import FirebaseNotInitializedError, FirebaseError, UserNotFoundError
+from exc import FirebaseNotInitializedError, FirebaseError, UserNotFoundError, BadTokenError
 
 # Functions import
 from os import environ
@@ -78,7 +78,16 @@ def initialize_firebase() -> None:
     firebase_app = firebase_admin.initialize_app(cred)
 
 
-def verify_token(token: str):
+def verify_token(token: str) -> str:
+    """
+    Verifies the token and returns the user id
+
+    :param token: Token to verify
+    :return: User id for which the token is verified
+    :raises BadTokenError: if the token is invalid
+    :raises FirebaseNotInitializedError: if the firebase app is not initialized
+    :raises RuntimeError: if an internal error occurs
+    """
     global firebase_app
     if firebase_app is None:
         raise FirebaseNotInitializedError()
@@ -87,12 +96,42 @@ def verify_token(token: str):
         decoded_token = auth.verify_id_token(token, check_revoked=True)
         uid = decoded_token['uid']
         return uid
-    # TODO: Handle exceptions
+
     except auth.RevokedIdTokenError:
-        return None
+        raise BadTokenError("Token has been revoked")
     except auth.UserDisabledError:
-        return None
+        raise BadTokenError("User has been disabled")
     except auth.InvalidIdTokenError:
-        return None
-    except Exception:
-        raise
+        raise BadTokenError("Token is invalid")
+    except Exception as e:
+        raise RuntimeError(e)
+
+
+def verify_token_for_user(token: str, uid: str):
+    """
+    Verifies the token and checks if it's for the given user
+    :param token: Token to verify
+    :param uid: User id for which the token is verified
+    :return: True if the token is valid and for the given user, False if token is valid but not for the given user
+    :raises BadTokenError: if the token is invalid
+    :raises FirebaseNotInitializedError: if the firebase app is not initialized
+    :raises RuntimeError: if an internal error occurs
+    """
+
+    return uid == verify_token(token)
+
+
+def verify_token_for_multiple(token: str, uids: list[str]):
+    """
+    Verifies the token and checks if it's for one of the given users
+    :param token: Token to verify
+    :param uids: User ids for which the token is verified
+    :return: True if the token is valid and for one of the given users, False if token is valid but not for any of the given users
+    :raises BadTokenError: if the token is invalid
+    :raises FirebaseNotInitializedError: if the firebase app is not initialized
+    :raises RuntimeError: if an internal error occurs
+    """
+
+    token_uid = verify_token(token)
+
+    return token_uid in uids
