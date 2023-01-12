@@ -17,6 +17,7 @@ from images import Image
 from messages import Message
 from offers import Offer
 from users import User
+from favorites import add_to_favorites, remove_from_favorites, get_user_favorites
 
 from json_encoder import APIEncoder, as_json
 from os import environ
@@ -178,6 +179,7 @@ def handle_post_images():
         return Error("Internal server error"), 500
 
 
+# Handle images
 @app.route("/image/<path:path>", methods=["GET"])
 def handle_get_image(path: str):
     return send_from_directory(IMAGE_PATH, path)
@@ -242,6 +244,7 @@ def handle_get_conversation(user_id: str):
     except Exception as e:
         print("Exception:", e)
         return Error("Internal server error"), 500
+
 
 # Get all messages from and to a user
 @app.route("/messages", methods=["GET"])
@@ -362,17 +365,59 @@ def handle_get_reviews(user_id: str):
 
 # FAVORITES
 # Add an offer to a user's favorites
-@app.route("/favorite", methods=["PUT"])
+@app.route("/favorites/<offer_id>", methods=["PUT"])
 @as_json
-def handle_add_favorite():
-    pass
+def handle_add_favorite(offer_id):
+    # TODO: Handle it better
+    try:
+        user = verify_token(request.headers["Authorization"].split(" ")[1])
+    except Exception as e:
+        print("Exception:", e)
+        return Error("Unauthorized"), 401
+
+    try:
+        add_to_favorites(user, offer_id)
+        return get_user_favorites(user), 201
+    except Exception as e:
+        print("Exception:", e)
+        return Error("Error"), 401
 
 
 # Remove an offer from a user's favorites
-@app.route("/favorite", methods=["DELETE"])
+@app.route("/favorites/<offer_id>", methods=["DELETE"])
 @as_json
-def handle_remove_favorite():
-    pass
+def handle_remove_favorite(offer_id):
+    # TODO: Handle it better
+    try:
+        user = verify_token(request.headers["Authorization"].split(" ")[1])
+    except Exception as e:
+        print("Exception:", e)
+        return Error("Unauthorized"), 401
+
+    try:
+        remove_from_favorites(user, offer_id)
+        return get_user_favorites(user), 200
+    except Exception as e:
+        print("Exception:", e)
+        return Error("Error"), 401
+
+
+# Get the user favorites
+@app.route("/favorites")
+@as_json
+def handle_get_favorites():
+    # TODO: Handle it better
+    try:
+        user = verify_token(request.headers["Authorization"].split(" ")[1])
+    except Exception as e:
+        print("Exception:", e)
+        return Error("Unauthorized"), 401
+
+    try:
+        return get_user_favorites(user), 200
+    except Exception as e:
+        print("Exception:", e)
+        return Error("Error"), 401
 
 
 # MISCELLANEOUS
