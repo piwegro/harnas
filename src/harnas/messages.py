@@ -134,6 +134,31 @@ class Message:
 
         return m
 
+    @classmethod
+    def get_recipients(cls, user_id: str) -> list[User]:
+        """
+        Get all users that have sent a message to a user or that have received a message from a user.
+
+        :param user_id: The id of the user.
+        :raises UserNotFoundError: If the user does not exist.
+        :return: A list of users.
+        """
+
+        try:
+            User.get_user_by_id(user_id)
+        except UserNotFoundError:
+            raise
+
+        users = []
+
+        result = fetch("SELECT DISTINCT sender_id FROM messages WHERE receiver_id = %s UNION "
+                       "SELECT DISTINCT receiver_id FROM messages WHERE sender_id = %s", (user_id, user_id))
+
+        for raw_user in result:
+            users.append(User.get_user_by_id(raw_user[0]))
+
+        return users
+
     def __str__(self) -> str:
         return f"Message {self.message_id} from {self.sender.uid} to {self.receiver.uid} at {self.sent_at}"
 

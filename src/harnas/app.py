@@ -263,6 +263,25 @@ def handle_get_user_conversations():
         return Error("Internal server error"), 500
 
 
+# Get all users that have a conversation with the current user
+@app.route("/messages/users", methods=["GET"])
+@as_json
+def handle_get_conversation_users():
+    try:
+        current_user = verify_token(request.headers["Authorization"].split(" ")[1])
+    except Exception as e:
+        print("Exception:", e)
+        return Error("Unauthorized"), 401
+
+    try:
+        return Message.get_recipients(current_user), 200
+    except UserNotFoundError:
+        return Error("User not found"), 400
+    except Exception as e:
+        print("Exception:", e)
+        return Error("Internal server error"), 500
+
+
 # Get all messages beetwen two users
 @app.route("/messages/<user_id>", methods=["GET"])
 @as_json
