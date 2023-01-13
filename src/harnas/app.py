@@ -220,10 +220,26 @@ def handle_add_user_to_db(user_id: str):
 
 
 # Update a single user's info (including accepted currencies)
-@app.route("/user/<user_id>", methods=["PATCH"])
+@app.route("/user", methods=["PATCH"])
 @as_json
 def handle_update_user(user_id: str):
-    return None, 204
+    try:
+        user = verify_token(request.headers["Authorization"].split(" ")[1])
+    except Exception as e:
+        print("Exception:", e)
+        return Error("Unauthorized"), 401
+
+    data = request.get_json()
+    new_currencies = data["currencies"]
+
+    try:
+        User.get_user_by_id(user).update_accepted_currencies(new_currencies)
+    except CurrencyNotFoundError:
+        return Error("Currency not found"), 400
+    except PostgresError as e:
+        print("PostgresError:", e)
+        return Error("Internal server error"), 500
+
 
 
 # MESSAGES
