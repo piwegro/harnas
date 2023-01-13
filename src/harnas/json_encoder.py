@@ -58,7 +58,7 @@ class APIEncoder(JSONEncoder):
                 'title': obj.title,
                 'description': obj.description,
                 'price': prices,
-                'seller_id': obj.seller.uid,
+                'seller': obj.seller,
                 'images': obj.images,
                 'location': obj.location,
                 'created_at': obj.created_at
@@ -82,9 +82,9 @@ class APIEncoder(JSONEncoder):
                     'thumbnail': obj.thumbnail
                 }
 
-            original_url = ROOT_URL + '/images/' + obj.original
-            preview_url = ROOT_URL + '/images/' + obj.preview
-            thumbnail_url = ROOT_URL + '/images/' + obj.thumbnail
+            original_url = ROOT_URL + '/image/' + obj.original
+            preview_url = ROOT_URL + '/image/' + obj.preview
+            thumbnail_url = ROOT_URL + '/image/' + obj.thumbnail
 
             return {
                 'image_id': obj.image_id,
