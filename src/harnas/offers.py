@@ -10,7 +10,7 @@ from images import Image
 from exc import OfferNotFoundError, UserNotFoundError, CurrencyNotFoundError, PostgresError
 
 # Functions import
-from db import fetch, execute
+from db import fetch
 
 RESULTS_PER_PAGE = 15
 
