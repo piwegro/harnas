@@ -71,6 +71,57 @@ class MessageAlreadySentError (PostgresError):
     def __str__(self):
         return f"Message with id {self.message.message_id} already sent."
 
+
+class ImageNotFoundError (PostgresError):
+    """Raised when an image is not found in the database."""
+
+    def __init__(self, image_id: int):
+        self.image_id = image_id
+
+    def __str__(self):
+        return f"Image with id {self.image_id} not found."
+
+
+class ImageEncodingError (Exception):
+    """Raised when an image encoding fails."""
+
+    def __init__(self, image_id: int):
+        self.image_id = image_id
+
+    def __str__(self):
+        return f"Image with id {self.image_id} encoding failed."
+
+
+class ImageAlreadySavedError(Exception):
+    """Raised when an image is already saved in the database."""
+
+    def __init__(self, image_id: int):
+        self.image_id = image_id
+
+    def __str__(self):
+        return f"Image with id {self.image_id} already saved."
+
+
+class ImageNotEditableError(Exception):
+    """Raised when an image is not editable."""
+
+    def __init__(self, image_id: int):
+        self.image_id = image_id
+
+    def __str__(self):
+        return f"Image with id {self.image_id} is not editable."
+
+
+class ImageNotSavedError(Exception):
+    """Raised when an image is not saved in the database."""
+
+    def __init__(self, image_id: int):
+        self.image_id = image_id
+
+    def __str__(self):
+        return f"Image with id {self.image_id} is not saved."
+
+
 class BadTokenError (Exception):
     """Raised when a user is not authorized to perform an action."""
 

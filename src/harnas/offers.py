@@ -61,6 +61,7 @@ class Offer:
 
         :raises UserNotFoundError: If the user with the given id does not exist.
         :raises CurrencyNotFoundError: If the currency with the given symbol does not exist.
+        :raises PostgresError: If the internal database query failed.
 
         :return: The new offer.
         """
@@ -70,6 +71,8 @@ class Offer:
         except UserNotFoundError:
             raise
         except CurrencyNotFoundError:
+            raise
+        except PostgresError:
             raise
 
         try:
@@ -82,17 +85,22 @@ class Offer:
     @classmethod
     def new_offer_from_row(cls, raw_offer) -> "Offer":
         """
-                Create a new offer from a row of the database
+        Creates a new offer from a raw row of the database.
 
-                :param raw_offer:
-                :return: an offer
-                """
+        :param raw_offer: The raw row of the database.
+        :return: An offer from the parsed row.
+        :raises UserNotFoundError: If the user with the given id does not exist.
+        :raises CurrencyNotFoundError: If the currency with the given symbol does not exist.
+        :raises PostgresError: If the internal error happens.
+        """
         try:
             currency = Currency.get_currency_by_symbol(raw_offer[5])
             user = User.get_user_by_id(raw_offer[1])
         except UserNotFoundError:
             raise
         except CurrencyNotFoundError:
+            raise
+        except PostgresError:
             raise
 
         try:

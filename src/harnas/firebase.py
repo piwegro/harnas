@@ -45,7 +45,6 @@ class FirebaseUser:
         if firebase_app is None:
             raise FirebaseNotInitializedError()
 
-        # TODO: Handle errors
         try:
             user_record = auth.get_user(uid)
         except auth.UserNotFoundError:
@@ -105,33 +104,3 @@ def verify_token(token: str) -> str:
         raise BadTokenError("Token is invalid")
     except Exception as e:
         raise RuntimeError(e)
-
-
-def verify_token_for_user(token: str, uid: str):
-    """
-    Verifies the token and checks if it's for the given user
-    :param token: Token to verify
-    :param uid: User id for which the token is verified
-    :return: True if the token is valid and for the given user, False if token is valid but not for the given user
-    :raises BadTokenError: if the token is invalid
-    :raises FirebaseNotInitializedError: if the firebase app is not initialized
-    :raises RuntimeError: if an internal error occurs
-    """
-
-    return uid == verify_token(token)
-
-
-def verify_token_for_multiple(token: str, uids: list[str]):
-    """
-    Verifies the token and checks if it's for one of the given users
-    :param token: Token to verify
-    :param uids: User ids for which the token is verified
-    :return: True if the token is valid and for one of the given users, False if token is valid but not for any of the given users
-    :raises BadTokenError: if the token is invalid
-    :raises FirebaseNotInitializedError: if the firebase app is not initialized
-    :raises RuntimeError: if an internal error occurs
-    """
-
-    token_uid = verify_token(token)
-
-    return token_uid in uids

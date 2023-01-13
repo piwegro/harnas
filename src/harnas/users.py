@@ -68,6 +68,28 @@ class User:
 
         self.accepted_currencies.append(currency)
 
+
+    def update_accepted_currencies(self, currency_string: list[str]) -> None:
+        """
+        Updates the accepted currencies of the user
+
+        :param currency_string: The new accepted currencies
+        :return: None
+        """
+        currecies = []
+        for currency in currency_string:
+            currecies.append(Currency.get_currency_by_symbol(currency))
+
+        # Remove all the old accepted currencies
+        execute("DELETE FROM accepted_currencies WHERE user_id = %s", (self.uid,))
+        self.accepted_currencies = []
+
+        # Add the new accepted currencies
+        for currency in currecies:
+            self.add_accepted_currency(currency)
+
+        self.accepted_currencies = currecies
+
     # TODO: Implement, should remove the accepted currency from the database (accepted_currencies) and then from
     #  the accepted_currencies list. Should also check whether the currency is already accepted. Should raise an
     #  exception if some database error occurs.
