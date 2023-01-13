@@ -26,7 +26,7 @@ def remove_from_favorites(user_id, offer_id) -> None:
     :raises PostgresError: if the internal error occurs
     """
     try:
-        execute("DELETE FROM favorites WHERE user = %s AND offer = %s", (user_id, offer_id))
+        execute("DELETE FROM favorites WHERE \"user\" = %s AND offer = %s", (user_id, offer_id))
     except PostgresError:
         raise
 
@@ -38,7 +38,7 @@ def get_user_favorites(user_id) -> list["Offer"]:
     :raises PostgresError: if the internal error occurs
     """
     try:
-        result = fetch("SELECT * FROM offers WHERE id IN (SELECT offer FROM favorites WHERE user = %s)", (user_id,))
+        result = fetch("SELECT * FROM offers WHERE id IN (SELECT offer FROM favorites WHERE \"user\" = %s)", (user_id,))
         o = []
 
         for row in result:
