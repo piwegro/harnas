@@ -8,6 +8,7 @@ from os import environ
 from pathlib import Path
 
 from db import fetch, execute
+from exc import ImageNotFoundError, PostgresError, ImageEncodingError, ImageNotEditableError, ImageNotSavedError
 
 from PIL import Image as PILImage
 import pillow_heif
@@ -73,12 +74,13 @@ class Image:
 
         :param b64_image: The base64 string.
         :return: The image object.
+        :raises ImageEncodingError: If the image could not be decoded.
         """
         try:
             img = PILImage.open(BytesIO(b64decode(b64_image)))
             return cls(img, None, None, None, None)
-        except Exception:
-            raise
+        except Exception as e:
+            raise ImageEncodingError from e
 
     @classmethod
     def get_image_by_id(cls, image_id: int) -> "Image":
@@ -87,12 +89,17 @@ class Image:
 
         :param image_id: The id of the image.
         :return: The image.
-        """
 
-        result = fetch("SELECT original, preview, thumbnail FROM images WHERE id = %s", (image_id,))
+        :raises ImageNotFoundError: If the image with the given id does not exist.
+        :raises PostgresError: If there is an error with the database.
+        """
+        try:
+            result = fetch("SELECT original, preview, thumbnail FROM images WHERE id = %s", (image_id,))
+        except PostgresError:
+            raise
 
         if len(result) == 0:
-            raise Exception()
+            raise ImageNotFoundError(image_id)
 
         return cls(None, image_id, result[0][0], result[0][1], result[0][2])
 
@@ -102,10 +109,15 @@ class Image:
         Gets all images of the offer with the given id.
 
         :param offer_id: The id of the offer.
-        :return: A list of images.
+        :return: A list of images. The list is empty if the offer has no images.
+
+        :raises PostgresError: If the database query fails.
         """
-        results = fetch("SELECT id, original, preview, thumbnail FROM images "
-                        "WHERE offer_id = %s", (offer_id,))
+        try:
+            results = fetch("SELECT id, original, preview, thumbnail FROM images "
+                            "WHERE offer_id = %s", (offer_id,))
+        except PostgresError:
+            raise
 
         return [cls(None, result[0], result[1], result[2], result[3]) for result in results]
 
@@ -124,13 +136,14 @@ class Image:
         """
         Saves the image both in the database and on the disk. Does nothing if the image is already saved.
 
-        :return: None
+        :raises PostgresError: If the database query fails.
+        :raises ImageNotEditableError: If the image is not editable.
         """
         if self.is_saved:
             return
 
         if not self.is_editable:
-            raise Exception()
+            raise ImageNotEditableError(self.image_id)
 
         group_name = str(uuid4())
 
@@ -152,9 +165,14 @@ class Image:
         thumbnail.save(thumbnail_path, "JPEG")
         self.thumbnail = thumbnail_name
 
+        try:
+            result = fetch("INSERT INTO images(original, preview, thumbnail) VALUES (%s, %s, %s) RETURNING id",
+                    (original_name, preview_name, thumbnail_name))
+        except PostgresError:
+            raise
 
-        result = fetch("INSERT INTO images(original, preview, thumbnail) VALUES (%s, %s, %s) RETURNING id",
-                (original_name, preview_name, thumbnail_name))
+        if len(result) == 0 or result[0][0] is None:
+            raise PostgresError("Could not insert image into database.")
 
         self.image_id = int(result[0][0])
 
@@ -165,8 +183,14 @@ class Image:
 
         :param offer_id: The id of the offer.
         :return: None
+
+        :raises PostgresError: If the database query fails.
+        :raises ImageNotFoundError: If the image does not exist.
         """
         if not self.is_saved:
-            raise Exception()
+            raise ImageNotSavedError(self.image_id)
 
-        execute("UPDATE images SET offer_id = %s WHERE id = %s", (offer_id, self.image_id))
+        try:
+            execute("UPDATE images SET offer_id = %s WHERE id = %s", (offer_id, self.image_id))
+        except PostgresError:
+            raise

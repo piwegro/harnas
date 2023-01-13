@@ -196,6 +196,28 @@ def handle_user_by_id(user_id: str):
         return Error("User not found"), 404
 
 
+# Update a single user's info (including accepted currencies)
+@app.route("/user", methods=["PATCH"])
+@as_json
+def handle_update_user(user_id: str):
+    try:
+        user = verify_token(request.headers["Authorization"].split(" ")[1])
+    except Exception as e:
+        print("Exception:", e)
+        return Error("Unauthorized"), 401
+
+    data = request.get_json()
+    new_currencies = data["currencies"]
+
+    try:
+        User.get_user_by_id(user).update_accepted_currencies(new_currencies)
+    except CurrencyNotFoundError:
+        return Error("Currency not found"), 400
+    except PostgresError as e:
+        print("PostgresError:", e)
+        return Error("Internal server error"), 500
+
+
 # Put a new user in the database (after sign up)
 @app.route("/user/<user_id>", methods=["PUT"])
 @as_json
@@ -219,49 +241,7 @@ def handle_add_user_to_db(user_id: str):
     return user, 201
 
 
-# Update a single user's info (including accepted currencies)
-@app.route("/user", methods=["PATCH"])
-@as_json
-def handle_update_user(user_id: str):
-    try:
-        user = verify_token(request.headers["Authorization"].split(" ")[1])
-    except Exception as e:
-        print("Exception:", e)
-        return Error("Unauthorized"), 401
-
-    data = request.get_json()
-    new_currencies = data["currencies"]
-
-    try:
-        User.get_user_by_id(user).update_accepted_currencies(new_currencies)
-    except CurrencyNotFoundError:
-        return Error("Currency not found"), 400
-    except PostgresError as e:
-        print("PostgresError:", e)
-        return Error("Internal server error"), 500
-
-
-
 # MESSAGES
-# Get all messages beetwen two users
-@app.route("/messages/<user_id>", methods=["GET"])
-@as_json
-def handle_get_conversation(user_id: str):
-    try:
-        current_user = verify_token(request.headers["Authorization"].split(" ")[1])
-    except Exception as e:
-        print("Exception:", e)
-        return Error("Unauthorized"), 401
-
-    try:
-        return Message.get_messages_beetween_user_ids(user_id, current_user), 200
-    except UserNotFoundError:
-        return Error("User not found"), 400
-    except Exception as e:
-        print("Exception:", e)
-        return Error("Internal server error"), 500
-
-
 # Get all messages from and to a user
 @app.route("/messages", methods=["GET"])
 @as_json
@@ -278,6 +258,25 @@ def handle_get_user_conversations():
         return result, 200
     except UserNotFoundError:
         return Error("User with given ID not found"), 400
+    except Exception as e:
+        print("Exception:", e)
+        return Error("Internal server error"), 500
+
+
+# Get all messages beetwen two users
+@app.route("/messages/<user_id>", methods=["GET"])
+@as_json
+def handle_get_conversation(user_id: str):
+    try:
+        current_user = verify_token(request.headers["Authorization"].split(" ")[1])
+    except Exception as e:
+        print("Exception:", e)
+        return Error("Unauthorized"), 401
+
+    try:
+        return Message.get_messages_beetween_user_ids(user_id, current_user), 200
+    except UserNotFoundError:
+        return Error("User not found"), 400
     except Exception as e:
         print("Exception:", e)
         return Error("Internal server error"), 500
@@ -379,6 +378,24 @@ def handle_get_reviews(user_id: str):
         return Error("Internal server error"), 500
 
 
+# Get the user favorites
+@app.route("/favorites")
+@as_json
+def handle_get_favorites():
+    # TODO: Handle it better
+    try:
+        user = verify_token(request.headers["Authorization"].split(" ")[1])
+    except Exception as e:
+        print("Exception:", e)
+        return Error("Unauthorized"), 401
+
+    try:
+        return get_user_favorites(user), 200
+    except Exception as e:
+        print("Exception:", e)
+        return Error("Error"), 401
+
+
 # FAVORITES
 # Add an offer to a user's favorites
 @app.route("/favorites/<offer_id>", methods=["PUT"])
@@ -412,24 +429,6 @@ def handle_remove_favorite(offer_id):
 
     try:
         remove_from_favorites(user, offer_id)
-        return get_user_favorites(user), 200
-    except Exception as e:
-        print("Exception:", e)
-        return Error("Error"), 401
-
-
-# Get the user favorites
-@app.route("/favorites")
-@as_json
-def handle_get_favorites():
-    # TODO: Handle it better
-    try:
-        user = verify_token(request.headers["Authorization"].split(" ")[1])
-    except Exception as e:
-        print("Exception:", e)
-        return Error("Unauthorized"), 401
-
-    try:
         return get_user_favorites(user), 200
     except Exception as e:
         print("Exception:", e)
