@@ -12,7 +12,7 @@ def add_to_favorites(user_id: str, offer_id: int) -> None:
     :raises PostgresError: if the internal error occurs
     """
     try:
-        execute("INSERT INTO favorites (user, offer) VALUES (%s, %s)", (user_id, offer_id))
+        execute("INSERT INTO favorites (\"user\", offer) VALUES (%s, %s)", (user_id, offer_id))
     except PostgresError:
         raise
 
