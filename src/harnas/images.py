@@ -14,7 +14,7 @@ from PIL import Image as PILImage
 import pillow_heif
 
 
-SIZES = [(96, 96), (200, 113), (1920, 1080)]
+SIZES = [(1920, 1080), (200, 113), (96, 96)]
 IMAGE_OUTPUT = environ["IMAGE_OUTPUT"]
 
 pillow_heif.register_heif_opener()
