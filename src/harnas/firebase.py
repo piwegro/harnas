@@ -8,7 +8,6 @@ from os import environ
 from firebase_admin import credentials, auth, exceptions
 from dataclasses import dataclass
 
-
 SERVICE_ACCOUNT_PATH = environ["SERVICE_ACCOUNT_PATH"]
 
 firebase_app = None
@@ -55,7 +54,6 @@ class FirebaseUser:
             raise FirebaseError("An error occurred while retrieving the user")
 
         return cls.from_user_record(user_record)
-
 
     def __str__(self):
         return f"FirebaseUser(uid={self.uid}, email={self.email}, name={self.name})"

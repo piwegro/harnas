@@ -1,4 +1,4 @@
-from harnas.error import Error
+from error import Error
 
 
 def test_from_exception():
