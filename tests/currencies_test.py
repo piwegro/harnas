@@ -6,9 +6,9 @@ environ["POSTGRES_PASSWORD"] = "postgres"
 environ["POSTGRES_DB_MAIN"] = "test_database"
 
 import unittest
-from harnas.currencies import Currency
-import harnas.db
-import harnas.exc
+from currencies import Currency
+import db
+import exc
 
 class currencies_test(unittest.TestCase):
 
@@ -21,24 +21,24 @@ class currencies_test(unittest.TestCase):
         self.assertEqual(repr(currency), 'Currency("US Dollar", "USD", "1.0")')
 
     def test_get_all(self):
-        harnas.db.connect()
-        harnas.db.execute("DELETE FROM piwegro.currencies", ())
-        harnas.db.execute("INSERT INTO piwegro.currencies (symbol, name, exchange_rate) VALUES (%s, %s, %s)", ('PER', 'Perla', 1.0))
+        db.connect()
+        db.execute("DELETE FROM piwegro.currencies", ())
+        db.execute("INSERT INTO piwegro.currencies (symbol, name, exchange_rate) VALUES (%s, %s, %s)", ('PER', 'Perla', 1.0))
         result = Currency.get_currencies()
         self.assertEqual(len(result), 1)
         self.assertEqual(result[0].name, 'Perla')
-        harnas.db.disconnect()
+        db.disconnect()
 
     def test_get_all_if_empty(self):
-        harnas.db.connect()
-        harnas.db.execute("DELETE FROM piwegro.currencies", ())
+        db.connect()
+        db.execute("DELETE FROM piwegro.currencies", ())
         self.assertEqual(len(Currency.get_currencies()), 0)
 
     def test_get_by_symbol(self):
-        harnas.db.connect()
-        harnas.db.execute("DELETE FROM piwegro.currencies", ())
-        harnas.db.execute("INSERT INTO piwegro.currencies (symbol, name, exchange_rate) VALUES (%s, %s, %s)", ('PER', 'Perla', 1.0))
+        db.connect()
+        db.execute("DELETE FROM piwegro.currencies", ())
+        db.execute("INSERT INTO piwegro.currencies (symbol, name, exchange_rate) VALUES (%s, %s, %s)", ('PER', 'Perla', 1.0))
         result = Currency.get_currency_by_symbol('PER')
         self.assertEqual(result.name, 'Perla')
         self.assertTrue(isinstance(result, Currency))
-        harnas.db.disconnect()
+        db.disconnect()

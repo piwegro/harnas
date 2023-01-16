@@ -6,7 +6,7 @@ environ["POSTGRES_USER"] = "postgres"
 environ["POSTGRES_PASSWORD"] = "postgres"
 environ["POSTGRES_DB_MAIN"] = "test_database"
 
-from harnas.currencies import Price, Currency
+from currencies import Price, Currency
 
 class price_test(unittest.TestCase):
     def test_str(self):

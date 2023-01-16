@@ -2,7 +2,7 @@
 name = "Harnas"
 
 [tool.pytest.ini_options]
-pythonpath = "src"
+pythonpath = "src/harnas"
 addopts = [
     "--import-mode=importlib",
 ]
